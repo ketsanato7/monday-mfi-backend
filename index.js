@@ -8,13 +8,41 @@ const morgan = require('morgan');
 const app = express();
 
 // ===== Middlewares =====
-app.use(cors());
-app.use(helmet());
-app.use(morgan('dev'));
+// CORS: ກຳນົດ origin ສະເພາະ (ບໍ່ໃຊ້ wildcard * ໃນ production)
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',')
+    : ['http://localhost:5173', 'http://localhost:3000'];
+app.use(cors({
+    origin: (origin, cb) => {
+        if (!origin || allowedOrigins.includes(origin)) cb(null, true);
+        else cb(new Error('CORS not allowed'));
+    },
+    credentials: true,
+}));
+app.use(helmet({
+    contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
+}));
+if (process.env.NODE_ENV !== 'production') app.use(morgan('dev'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use('/uploads', express.static('uploads'));
+
+// ===== Rate Limiting (Login brute-force protection) =====
+const loginAttempts = new Map();
+app.use('/api/auth/login', (req, res, next) => {
+    if (req.method !== 'POST') return next();
+    const ip = req.ip;
+    const now = Date.now();
+    const record = loginAttempts.get(ip) || { count: 0, firstAttempt: now };
+    if (now - record.firstAttempt > 15 * 60 * 1000) { record.count = 0; record.firstAttempt = now; }
+    record.count++;
+    loginAttempts.set(ip, record);
+    if (record.count > 10) {
+        return res.status(429).json({ status: false, message: 'ເກີນຈຳນວນຄັ້ງ — ລໍຖ້າ 15 ນາທີ' });
+    }
+    next();
+});
 
 // ===== Audit Middleware =====
 app.use('/api', (req, res, next) => {
@@ -176,7 +204,7 @@ app.get('/', (req, res) => {
 // ===== Error handler =====
 app.use((err, req, res, next) => {
     console.error('❌ Unhandled error:', err);
-    res.status(500).json({ message: 'Internal server error', error: err.message });
+    res.status(500).json({ message: 'Internal server error' });
 });
 
 // ===== Start server =====

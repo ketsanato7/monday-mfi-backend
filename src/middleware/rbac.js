@@ -35,7 +35,7 @@ async function loadPermissions() {
 }
 
 /**
- * requireAuth — Decode token and attach user to req
+ * requireAuth — Verify JWT token and attach user to req
  */
 function requireAuth(req, res, next) {
     const authHeader = req.headers.authorization;
@@ -45,12 +45,14 @@ function requireAuth(req, res, next) {
     }
 
     try {
+        const jwt = require('jsonwebtoken');
+        const JWT_SECRET = process.env.JWT_SECRET || 'monday_mfi_secret_key_2025';
         const token = authHeader.split(' ')[1];
-        const decoded = JSON.parse(Buffer.from(token, 'base64').toString());
+        const decoded = jwt.verify(token, JWT_SECRET);
         req.user = decoded;
         next();
     } catch {
-        return res.status(401).json({ status: false, message: '❌ Token ບໍ່ຖືກຕ້ອງ' });
+        return res.status(401).json({ status: false, message: '❌ Token ໝົດອາຍຸ ຫຼື ບໍ່ຖືກຕ້ອງ' });
     }
 }
 
