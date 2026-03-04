@@ -1,0 +1,49 @@
+# ═══ Render.com Blueprint ═══
+# Auto-deploy config for monday-mfi-backend
+
+databases:
+  - name: monday-mfi-db
+    plan: free
+    databaseName: monday_mfi
+    user: monday_admin
+
+services:
+  - type: web
+    name: monday-mfi-api
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: PORT
+        value: 3001
+      - key: DB_HOST
+        fromDatabase:
+          name: monday-mfi-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: monday-mfi-db
+          property: port
+      - key: DB_USER
+        fromDatabase:
+          name: monday-mfi-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: monday-mfi-db
+          property: password
+      - key: DB_NAME
+        fromDatabase:
+          name: monday-mfi-db
+          property: database
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NODE_ENV
+        value: production
+      - key: IT_FEE_RATE
+        value: "0.005"
+      - key: IT_FEE_MIN
+        value: "1000"
+      - key: IT_FEE_MAX
+        value: "50000"
