@@ -9,6 +9,11 @@ module.exports = (sequelize, DataTypes) => {
         branch_id: { type: DataTypes.STRING(50) },
         status: { type: DataTypes.STRING(20), defaultValue: 'draft' },
         created_at: { type: DataTypes.DATE },
-        updated_at: { type: DataTypes.DATE }
-    }, { tableName: 'financial_statements', createdAt: 'created_at', updatedAt: 'updated_at' });
+        updated_at: { type: DataTypes.DATE },
+    // ═══ Audit Trail (AML/CFT ມ.22) ═══
+    created_by: { type: DataTypes.INTEGER },
+    updated_by: { type: DataTypes.INTEGER },
+    // ═══ Soft Delete (AML/CFT ມ.20) ═══
+    deleted_at: { type: DataTypes.DATE },
+    }, { tableName: 'financial_statements', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

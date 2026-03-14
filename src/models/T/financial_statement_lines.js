@@ -9,6 +9,14 @@ module.exports = (sequelize, DataTypes) => {
         amount: { type: DataTypes.DECIMAL(20, 2), defaultValue: 0 },
         amount_previous: { type: DataTypes.DECIMAL(20, 2), defaultValue: 0 },
         is_header: { type: DataTypes.BOOLEAN, defaultValue: false },
-        indent_level: { type: DataTypes.INTEGER, defaultValue: 0 }
-    }, { tableName: 'financial_statement_lines', timestamps: false });
+        indent_level: { type: DataTypes.INTEGER, defaultValue: 0 },
+        // ═══ Audit Fields (AML/CFT ມ.20) ═══
+        created_at: { type: DataTypes.DATE },
+        updated_at: { type: DataTypes.DATE },
+    // ═══ Audit Trail (AML/CFT ມ.22) ═══
+    created_by: { type: DataTypes.INTEGER },
+    updated_by: { type: DataTypes.INTEGER },
+    // ═══ Soft Delete (AML/CFT ມ.20) ═══
+    deleted_at: { type: DataTypes.DATE },
+    }, { tableName: 'financial_statement_lines', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

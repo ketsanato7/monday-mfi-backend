@@ -8,6 +8,7 @@
  * ⇒ insert ໃສ່ borrowers_individual table ໂດຍກົງ
  *   (ເພາະ table ມີ columns ສຳລັບ personal_info ທັງໝົດ ໃນ table ດຽວ)
  */
+const logger = require('../config/logger');
 const express = require('express');
 const router = express.Router();
 const db = require('../models/index');
@@ -146,7 +147,7 @@ router.post('/borrowers_individual/register', requirePermission('ສ້າງສ
         );
 
         const created = result[0]?.[0] || result[0] || payload;
-        console.log(`✅ ລົງທະບຽນຜູ້ກູ້ໃໝ່ສຳເລັດ: ${payload.firstname__l_a} ${payload.lastname__l_a} (borrower_id: ${nextBorrowerId})`);
+        logger.info(`✅ ລົງທະບຽນຜູ້ກູ້ໃໝ່ສຳເລັດ: ${payload.firstname__l_a} ${payload.lastname__l_a} (borrower_id: ${nextBorrowerId})`);
 
         res.status(201).json({
             message: 'ລົງທະບຽນສຳເລັດ',
@@ -154,7 +155,7 @@ router.post('/borrowers_individual/register', requirePermission('ສ້າງສ
             borrower_id: nextBorrowerId,
         });
     } catch (err) {
-        console.error('❌ Register error:', err);
+        logger.error('❌ Register error:', err);
         res.status(500).json({
             error: err.message || 'Internal server error',
             details: err.original?.detail || null,

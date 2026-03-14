@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="lo">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ໃບ ແຈ້ງ ໜີ້</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+
+        body {
+            font-family: 'Phetsarath OT', 'Noto Sans Lao', sans-serif;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #c62828;
+            padding-bottom: 8px;
+        }
+
+        .header h1 {
+            font-size: 16px;
+            color: #1a237e;
+        }
+
+        .header h2 {
+            font-size: 20px;
+            color: #c62828;
+        }
+
+        .urgent {
+            background: #ffebee;
+            border: 2px solid #c62828;
+            padding: 10px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #c62828;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+
+        td {
+            border: 1px solid #ddd;
+            padding: 6px 10px;
+        }
+
+        td.label {
+            background: #f5f5f5;
+            font-weight: bold;
+            width: 35%;
+        }
+
+        .overdue-table th {
+            background: #c62828;
+            color: white;
+            padding: 6px;
+        }
+
+        .total {
+            font-size: 16px;
+            font-weight: bold;
+            color: #c62828;
+            text-align: right;
+            margin: 10px 0;
+        }
+
+        .warning {
+            background: #fff3e0;
+            padding: 10px;
+            border-left: 4px solid #ff9800;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+
+        .legal {
+            font-size: 11px;
+            color: #666;
+            margin-top: 15px;
+        }
+
+        .sig {
+            border-top: 1px solid #333;
+            width: 200px;
+            text-align: center;
+            padding-top: 3px;
+            margin-top: 50px;
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>{{mfi_name}}</h1>
+        <h2>⚠️ ໃບ ແຈ້ງ ໜີ້ ຄ້າງ ຊຳ ລະ</h2>
+        <div style="font-size:11px;color:#666">OVERDUE PAYMENT NOTICE</div>
+    </div>
+
+    <div style="text-align:right;font-size:12px;margin-bottom:10px;">
+        ເລກ ທີ: {{notice_no}} | ວັນ ທີ: {{date}}
+    </div>
+
+    <div class="urgent">
+        🚨 ທ່ານ ມີ ໜີ້ ຄ້າງ ຊຳ ລະ {{overdue_days}} ວັນ — ກະ ລຸ ນາ ຊຳ ລະ ດ່ວນ
+    </div>
+
+    <!-- ===== ຂໍ້ ມູນ ===== -->
+    <table>
+        <tr>
+            <td class="label">ຜູ້ ກູ້</td>
+            <td>{{borrower_name}}</td>
+        </tr>
+        <tr>
+            <td class="label">ສັນ ຍາ ເລກ ທີ</td>
+            <td>{{contract_no}}</td>
+        </tr>
+        <tr>
+            <td class="label">ຈຳ ນວນ ເງິນ ກູ້</td>
+            <td>{{loan_amount}}</td>
+        </tr>
+        <tr>
+            <td class="label">ຈັດ ຊັ້ນ ໜີ້</td>
+            <td>{{classification}} (DPD: {{dpd}} ວັນ)</td>
+        </tr>
+    </table>
+
+    <!-- ===== ງວດ ຄ້າງ ===== -->
+    <table class="overdue-table">
+        <thead>
+            <tr>
+                <th>ງວດ</th>
+                <th>ວັນ ກຳ ນົດ</th>
+                <th>ຕົ້ນ ທຶນ</th>
+                <th>ດອກ ເບ້ຍ</th>
+                <th>ຄ່າ ປັບ</th>
+                <th>ລວມ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{overdue_rows}}
+        </tbody>
+    </table>
+
+    <div class="total">ລວມ ຍອດ ຄ້າງ ທັງ ໝົດ: {{total_overdue}}</div>
+
+    <div class="warning">
+        <strong>⚠️ ຄຳ ເຕືອນ:</strong><br>
+        - ຖ້າ ບໍ່ ຊຳ ລະ ພາຍ ໃນ 15 ວັນ, ໜີ້ ຈະ ຖືກ ຍົກ ຊັ້ນ ແລະ ປັບ ສຳ ຮອງ ເພີ່ມ<br>
+        - ຊ້າ ≥90 ວັນ → ຊັ້ນ C (ສຳ ຮອງ 20%)<br>
+        - ຊ້າ ≥180 ວັນ → ຊັ້ນ D-E (ສຳ ຮອງ 50-100%) + ອາດ ຍຶດ ຫຼັກ ຊັບ<br>
+        - ລາຍ ງານ BoL + ບັນ ຊີ ດຳ
+    </div>
+
+    <div style="margin-top:25px;text-align:center;">
+        <span class="sig">ເຈົ້າ ໜ້າ ທີ່ ສິນ ເຊື່ອ</span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="sig">ຫົວ ໜ້າ ພະ ແນກ</span>
+    </div>
+
+    <div class="legal">
+        📌 ອ້າງ ອີງ: ກົດ ໝາຍ ກວດ ກາ ທະ ນາ ຄານ 2023 + ດຳ ລັດ 184/ລບ (ການ ຈັດ ຊັ້ນ ໜີ້)
+    </div>
+</body>
+
+</html>

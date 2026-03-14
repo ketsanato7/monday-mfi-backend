@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <title>ໃບ ສະ ເໜີ ຂໍ ກູ້ ຢືມ</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        @page { size: A4; margin: 15mm; }
+        body { font-family: 'Phetsarath OT', 'Noto Sans Lao', sans-serif; font-size: 13px; line-height: 1.6; color: #222; }
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #1a237e; padding-bottom: 10px; }
+        .header h1 { font-size: 18px; color: #1a237e; }
+        .header h2 { font-size: 22px; margin-top: 5px; }
+        .header .sub { font-size: 12px; color: #666; }
+        .doc-no { display: flex; justify-content: space-between; margin: 10px 0; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        table.form-table td { border: 1px solid #ccc; padding: 6px 10px; }
+        table.form-table td.label { background: #f5f5f5; font-weight: bold; width: 35%; }
+        .section { margin: 15px 0; }
+        .section-title { font-size: 15px; font-weight: bold; color: #1a237e; border-bottom: 1px solid #1a237e; padding-bottom: 3px; margin-bottom: 8px; }
+        .signature-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; margin-top: 40px; text-align: center; }
+        .signature-box { border-top: 1px solid #333; padding-top: 5px; margin-top: 60px; }
+        .checkbox { display: inline-block; width: 14px; height: 14px; border: 1px solid #333; margin-right: 5px; vertical-align: middle; }
+        .note { font-size: 11px; color: #666; font-style: italic; margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 5px; }
+        .stamp-area { border: 1px dashed #999; width: 100px; height: 100px; text-align: center; line-height: 100px; color: #999; font-size: 11px; float: right; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{mfi_name}}</h1>
+        <div class="sub">ສາ ຂາ: {{branch_name}} | ໂທ: {{branch_phone}}</div>
+        <h2>📋 ໃບ ສະ ເໜີ ຂໍ ກູ້ ຢືມ</h2>
+        <div class="sub">LOAN APPLICATION FORM</div>
+    </div>
+
+    <div class="doc-no">
+        <span>ເລກ ທີ: {{doc_number}}</span>
+        <span>ວັນ ທີ: {{date}}</span>
+    </div>
+
+    <!-- ===== ຂໍ້ ມູນ ຜູ້ ກູ້ ===== -->
+    <div class="section">
+        <div class="section-title">1. ຂໍ້ ມູນ ຜູ້ ກູ້</div>
+        <table class="form-table">
+            <tr><td class="label">ຊື່ ແລະ ນາມ ສະ ກຸນ (ລາວ)</td><td>{{borrower_name_la}}</td></tr>
+            <tr><td class="label">ຊື່ ແລະ ນາມ ສະ ກຸນ (ອັງ ກິດ)</td><td>{{borrower_name_en}}</td></tr>
+            <tr><td class="label">ເລກ ບັດ ປະ ຈຳ ຕົວ</td><td>{{id_card_no}}</td></tr>
+            <tr><td class="label">ວັນ ເດືອນ ປີ ເກີດ</td><td>{{date_of_birth}}</td></tr>
+            <tr><td class="label">ເບີ ໂທ</td><td>{{phone}}</td></tr>
+            <tr><td class="label">ທີ່ ຢູ່</td><td>{{address}}</td></tr>
+            <tr><td class="label">ອາ ຊີບ</td><td>{{career}}</td></tr>
+            <tr><td class="label">ລາຍ ຮັບ ຕໍ່ ເດືອນ</td><td>{{monthly_income}}</td></tr>
+        </table>
+    </div>
+
+    <!-- ===== ຂໍ້ ມູນ ການ ກູ້ ===== -->
+    <div class="section">
+        <div class="section-title">2. ຂໍ້ ມູນ ການ ກູ້ ຢືມ</div>
+        <table class="form-table">
+            <tr><td class="label">ຈຳ ນວນ ເງິນ ກູ້</td><td>{{loan_amount}} ({{loan_amount_text}})</td></tr>
+            <tr><td class="label">ປະ ເພດ ສິນ ເຊື່ອ</td><td>{{loan_product}}</td></tr>
+            <tr><td class="label">ຈຸດ ປະ ສົງ ກູ້</td><td>{{loan_purpose}}</td></tr>
+            <tr><td class="label">ໄລ ຍະ ເວ ລາ</td><td>{{term_months}} ເດືອນ</td></tr>
+            <tr><td class="label">ອັດ ຕາ ດອກ ເບ້ຍ</td><td>{{interest_rate}}% ຕໍ່ ປີ</td></tr>
+            <tr><td class="label">ວິ ທີ ຄິດ ດອກ ເບ້ຍ</td><td><span class="checkbox"></span> ຫຼຸດ ຕົ້ນ <span class="checkbox"></span> ຄົງ ທີ່</td></tr>
+        </table>
+    </div>
+
+    <!-- ===== ຫຼັກ ຊັບ ===== -->
+    <div class="section">
+        <div class="section-title">3. ຫຼັກ ຊັບ ຄ້ຳ ປະ ກັນ</div>
+        <table class="form-table">
+            <tr><td class="label">ປະ ເພດ ຫຼັກ ຊັບ</td><td>{{collateral_type}}</td></tr>
+            <tr><td class="label">ລາຍ ລະ ອຽດ</td><td>{{collateral_detail}}</td></tr>
+            <tr><td class="label">ມູນ ຄ່າ ປະ ເມີນ</td><td>{{collateral_value}}</td></tr>
+            <tr><td class="label">ເລກ ທີ ເອ ກະ ສານ</td><td>{{collateral_doc_no}}</td></tr>
+        </table>
+    </div>
+
+    <!-- ===== ຜູ້ ຄ້ຳ ປະ ກັນ ===== -->
+    <div class="section">
+        <div class="section-title">4. ຜູ້ ຄ້ຳ ປະ ກັນ (ຖ້າ ມີ)</div>
+        <table class="form-table">
+            <tr><td class="label">ຊື່ ຜູ້ ຄ້ຳ</td><td>{{guarantor_name}}</td></tr>
+            <tr><td class="label">ເລກ ບັດ</td><td>{{guarantor_id}}</td></tr>
+            <tr><td class="label">ຄວາມ ສຳ ພັນ</td><td>{{guarantor_relation}}</td></tr>
+        </table>
+    </div>
+
+    <!-- ===== ລາຍ ເຊັນ ===== -->
+    <div class="signature-grid">
+        <div>
+            <div class="signature-box">ຜູ້ ສະ ເໜີ ກູ້</div>
+            <div style="font-size:11px;margin-top:3px">ວັນ ທີ: ____/____/________</div>
+        </div>
+        <div>
+            <div class="signature-box">ຜູ້ ຄ້ຳ ປະ ກັນ</div>
+            <div style="font-size:11px;margin-top:3px">ວັນ ທີ: ____/____/________</div>
+        </div>
+        <div>
+            <div class="signature-box">ເຈົ້າ ໜ້າ ທີ່ ຮັບ ເລື່ອງ</div>
+            <div style="font-size:11px;margin-top:3px">ວັນ ທີ: ____/____/________</div>
+        </div>
+    </div>
+
+    <div class="note">
+        📌 ໝາຍ ເຫດ: ການ ກູ້ ຢືມ ທຸກ ປະ ເພດ ຕ້ອງ ປະ ຕິ ບັດ ຕາມ ດຳ ລັດ BoL 184/ລບ ແລະ ກົດ ໝາຍ AML/CFT 2024.
+        ເພ ດານ ສິນ ເຊື່ອ MFI ສູງ ສຸດ 50,000,000 ₭ ຕໍ່ ສັນ ຍາ.
+    </div>
+</body>
+</html>

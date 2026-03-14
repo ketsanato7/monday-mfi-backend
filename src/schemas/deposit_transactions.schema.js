@@ -10,7 +10,8 @@ const createSchema = z.object({
     balance_after: z.number(),
     reference_no: z.string().max(100).optional().nullable(),
     processed_by: z.number().int().optional().nullable(),
-    remarks: z.string().optional().nullable()
+    remarks: z.string().optional().nullable(),
+    branch_id: z.string().max(50).optional().nullable()
 });
 
 const updateSchema = createSchema.partial();
@@ -24,7 +25,8 @@ const querySchema = z.object({
     balance_after: z.number(),
     reference_no: z.string().max(100).optional().nullable(),
     processed_by: z.number().int().optional().nullable(),
-    remarks: z.string().optional().nullable()
+    remarks: z.string().optional().nullable(),
+    branch_id: z.string().max(50).optional().nullable()
 }).partial();
 
 module.exports = {

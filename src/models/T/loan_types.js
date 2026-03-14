@@ -7,7 +7,10 @@ module.exports = (sequelize, DataTypes) => {
         description: { type: DataTypes.STRING },
         created_at: { type: DataTypes.DATE },
         updated_at: { type: DataTypes.DATE },
+        // ═══ Audit Trail (AML/CFT ມ.22) ═══
+        created_by: { type: DataTypes.INTEGER },
+        updated_by: { type: DataTypes.INTEGER },
         deleted_at: { type: DataTypes.DATE },
         status: { type: DataTypes.STRING(50), defaultValue: 'ACTIVE' }
-    }, { tableName: 'loan_types', createdAt: 'created_at', updatedAt: 'updated_at' });
+    }, { tableName: 'loan_types', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

@@ -7,6 +7,11 @@ module.exports = (sequelize, DataTypes) => {
         from_status: { type: DataTypes.STRING(50) },
         to_status: { type: DataTypes.STRING(50), allowNull: false },
         comments: { type: DataTypes.TEXT },
-        created_at: { type: DataTypes.DATE }
-    }, { tableName: 'loan_approval_history', timestamps: false });
+        created_at: { type: DataTypes.DATE },
+    // ═══ Audit Trail (AML/CFT ມ.22) ═══
+    created_by: { type: DataTypes.INTEGER },
+    updated_by: { type: DataTypes.INTEGER },
+    // ═══ Soft Delete (AML/CFT ມ.20) ═══
+    deleted_at: { type: DataTypes.DATE },
+    }, { tableName: 'loan_approval_history', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

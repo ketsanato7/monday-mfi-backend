@@ -24,6 +24,9 @@ module.exports = (sequelize, DataTypes) => {
         weight_unit: { type: DataTypes.STRING(50) },
         updated_at: { type: DataTypes.DATE },
         created_at: { type: DataTypes.DATE },
+        // ═══ Audit Trail (AML/CFT ມ.22) ═══
+        created_by: { type: DataTypes.INTEGER },
+        updated_by: { type: DataTypes.INTEGER },
         deleted_at: { type: DataTypes.DATE }
-    }, { tableName: 'iif_collateral_details', createdAt: 'created_at', updatedAt: 'updated_at' });
+    }, { tableName: 'iif_collateral_details', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

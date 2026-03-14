@@ -2,245 +2,313 @@
  * crudFactory.js — Factory to generate CRUD controller + router for any Sequelize model
  *
  * Supports BOTH frontend API patterns:
- *   Pattern A (Legacy):  GET /name/read, POST /name/readone, GET /name/get, etc.
- *   Pattern B (RTK CRUD): GET /name, POST /name, PUT /name/:id, DELETE /name/:id
- *
- * Optionally validates request bodies using Zod schemas.
+ *   Pattern A (Legacy):  GET /name/read, POST /name/readone, etc.
+ *   Pattern B (RESTful):  GET /name, POST /name, PUT /name/:id, DELETE /name/:id
  */
 const express = require('express');
+const { QueryTypes } = require('sequelize');
+const bcrypt = require('bcryptjs');
+const { isSharedTable } = require('../middleware/tenantFilter');
 
-/**
- * Zod validation middleware factory
- * @param {object} zodSchema - Zod schema (createSchema or updateSchema)
- * @returns {Function} Express middleware
- */
+// ═══════════════════════════════════════════
+// Helpers
+// ═══════════════════════════════════════════
+
+const SENSITIVE_COLS = ['password_hash', 'reset_token', 'api_key'];
+
+/** Response helpers */
+const wrap = (res, code, data, msg) =>
+    res.status(code).json({ data, message: msg, status: true });
+
+const sendError = (res, label, error) => {
+    console.error(`❌ ${label}:`, error.message);
+    if (error.name === 'SequelizeUniqueConstraintError')
+        return res.status(400).json({ message: 'ຂໍ້ມູນຊ້ຳກັນ (Duplicate)', status: false, error: error.errors?.[0]?.message });
+    if (error.name === 'SequelizeForeignKeyConstraintError')
+        return res.status(400).json({ message: 'ບໍ່ສາມາດລຶບໄດ້ (FK constraint)', status: false, error: error.message });
+    res.status(500).json({ message: 'Internal server error', status: false, error: error.message });
+};
+
+/** Strip sensitive columns from rows */
+const stripSensitive = (rows) =>
+    rows.map(row => {
+        const clean = row.toJSON ? row.toJSON() : { ...row };
+        SENSITIVE_COLS.forEach(c => delete clean[c]);
+        return clean;
+    });
+
+/** Parse pagination from query */
+const parsePagination = (query) => {
+    const want = !!(query.page || query.pageSize);
+    const page = Math.max(parseInt(query.page) || 1, 1);
+    const pageSize = Math.min(Math.max(parseInt(query.pageSize) || 500, 1), 5000);
+    return { want, page, pageSize, offset: (page - 1) * pageSize };
+};
+
+/** Zod validation middleware */
 function validate(zodSchema) {
-    if (!zodSchema) return (req, res, next) => next();
-
+    if (!zodSchema) return (_req, _res, next) => next();
     return (req, res, next) => {
-        try {
-            const result = zodSchema.safeParse(req.body);
-            if (!result.success) {
-                const errors = result.error.issues.map(i => ({
-                    field: i.path.join('.'),
-                    message: i.message,
-                }));
-                return res.status(400).json({
-                    message: 'Validation failed',
-                    status: false,
-                    errors,
-                });
-            }
-            // Use parsed (coerced) data
-            req.body = result.data;
-            next();
-        } catch (err) {
-            // If Zod is not installed or schema is invalid, skip validation
-            next();
+        const result = zodSchema.safeParse(req.body);
+        if (!result.success) {
+            return res.status(400).json({
+                message: 'Validation failed', status: false,
+                errors: result.error.issues.map(i => ({ field: i.path.join('.'), message: i.message })),
+            });
         }
+        req.body = result.data;
+        next();
     };
 }
 
-/**
- * Create a generic CRUD controller object for a given Sequelize model
- */
-function createController(Model, options = {}) {
-    const { includes = [], idField = 'id', viewName = null, sequelize = null } = options;
+// ═══════════════════════════════════════════
+// Org ID Cache (module-level singleton)
+// ═══════════════════════════════════════════
+const _orgIdCache = {};
 
-    const buildInclude = (db) => {
-        if (!includes.length) return [];
-        return includes.map(inc => {
-            if (typeof inc === 'string') {
-                return db[inc] ? { model: db[inc] } : null;
+async function hasOrgIdColumn(Model, tableName, sequelize, viewName = null) {
+    // When using a VIEW, check the VIEW name (not base table)
+    const checkName = viewName || tableName;
+    if (checkName in _orgIdCache) return _orgIdCache[checkName];
+    if (!viewName && Model.rawAttributes?.org_id) return (_orgIdCache[checkName] = true);
+    try {
+        const seq = sequelize || Model.sequelize;
+        if (!seq) return (_orgIdCache[checkName] = false);
+        const rows = await seq.query(
+            `SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name=$1 AND column_name='org_id' LIMIT 1`,
+            { bind: [checkName], type: QueryTypes.SELECT }
+        );
+        return (_orgIdCache[checkName] = rows.length > 0);
+    } catch {
+        return (_orgIdCache[checkName] = false);
+    }
+}
+
+// ═══════════════════════════════════════════
+// Tenant WHERE builder (reusable)
+// ═══════════════════════════════════════════
+
+async function tenantCondition(tableName, Model, sequelize, req, viewName = null) {
+    if (!req.tenantOrgId) return {};
+    if (isSharedTable(tableName)) return {};
+    if (!(await hasOrgIdColumn(Model, tableName, sequelize, viewName))) return {};
+    return { org_id: req.tenantOrgId };
+}
+
+/** Auto-inject org_id + hash password */
+async function preprocessBody(req, tableName, Model, sequelize) {
+    // Inject org_id
+    if (req.tenantOrgId && !req.body.org_id && (await hasOrgIdColumn(Model, tableName, sequelize))) {
+        req.body.org_id = req.tenantOrgId;
+    }
+    // Auto-hash password
+    if (tableName === 'users' && req.body.password) {
+        req.body.password_hash = await bcrypt.hash(req.body.password, 10);
+        delete req.body.password;
+    }
+}
+
+// ═══════════════════════════════════════════
+// CRUD Controller Factory
+// ═══════════════════════════════════════════
+
+function createController(Model, options = {}) {
+    const { idField = 'id', viewName = null, sequelize = null } = options;
+    const hasDeletedAt = !!Model.rawAttributes?.deleted_at;
+    const tableName = Model.tableName || '';
+
+    // ── getAll (unified: wrapped=false → array, wrapped=true → {data,message,status}) ──
+    const _getAll = async (req, res, wrapped) => {
+        try {
+            const showDeleted = req.query.show_deleted === 'true';
+            const tenant = await tenantCondition(tableName, Model, sequelize, req, viewName);
+            const pag = parsePagination(req.query);
+            let data, total = null;
+
+            if (viewName && sequelize) {
+                const conditions = [];
+                const bind = {};
+                if (!showDeleted && hasDeletedAt) conditions.push('deleted_at IS NULL');
+                if (tenant.org_id) {
+                    conditions.push('org_id = $org');
+                    bind.org = tenant.org_id;
+                }
+                const where = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';
+
+                if (pag.want) {
+                    const [cnt] = await sequelize.query(`SELECT COUNT(*) as cnt FROM ${viewName} ${where}`, { type: QueryTypes.SELECT, bind });
+                    total = parseInt(cnt?.cnt || 0);
+                }
+                data = await sequelize.query(`SELECT * FROM ${viewName} ${where} LIMIT ${pag.pageSize} OFFSET ${pag.offset}`, { type: QueryTypes.SELECT, bind });
+            } else {
+                const where = {
+                    ...(!showDeleted && hasDeletedAt ? { deleted_at: null } : {}),
+                    ...tenant,
+                };
+                if (pag.want) {
+                    const result = await Model.findAndCountAll({ where, limit: pag.pageSize, offset: pag.offset, order: [['id', 'DESC']] });
+                    data = result.rows; total = result.count;
+                } else {
+                    data = await Model.findAll({ where, limit: 5000 });
+                }
             }
-            return inc;
-        }).filter(Boolean);
+
+            data = stripSensitive(Array.isArray(data) ? data : []);
+
+            if (wrapped) return wrap(res, 200, data, 'Select successfully');
+            if (pag.want) return res.json({ data, total, page: pag.page, pageSize: pag.pageSize });
+            res.json(data);
+        } catch (e) { sendError(res, `getAll(${tableName})`, e); }
+    };
+
+    // ── getByFK (filter by body fields, supports view) ──
+    const _getByFK = async (req, res) => {
+        try {
+            const tenant = await tenantCondition(tableName, Model, sequelize, req, viewName);
+            let data;
+
+            if (viewName && sequelize) {
+                const conditions = [];
+                const replacements = {};
+                Object.entries(req.body).forEach(([key, val], i) => {
+                    if (val != null && val !== '') { conditions.push(`${key} = :p${i}`); replacements[`p${i}`] = val; }
+                });
+                if (tenant.org_id) { conditions.push('org_id = :org'); replacements.org = tenant.org_id; }
+                if (hasDeletedAt) conditions.push('deleted_at IS NULL');
+                const where = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';
+                data = await sequelize.query(`SELECT * FROM ${viewName} ${where}`, { type: QueryTypes.SELECT, replacements });
+            } else {
+                data = await Model.findAll({ where: { ...req.body, ...tenant } });
+            }
+            wrap(res, 200, data, 'Select by FK successfully');
+        } catch (e) { sendError(res, `getByFK(${tableName})`, e); }
     };
 
     return {
-        // GET all records
-        getAll: async (req, res) => {
-            try {
-                let data;
-                if (viewName && sequelize) {
-                    const { QueryTypes } = require('sequelize');
-                    data = await sequelize.query(
-                        `SELECT * FROM ${viewName}`,
-                        { type: QueryTypes.SELECT }
-                    );
-                } else {
-                    data = await Model.findAll();
-                }
-                res.status(200).json(data);
-            } catch (error) {
-                console.error(`Error in getAll:`, error.message);
-                res.status(500).json({ message: 'Internal server error', error: error.message });
-            }
-        },
+        getAll: (req, res) => _getAll(req, res, false),
+        getAllWrapped: (req, res) => _getAll(req, res, true),
 
-        // GET all with legacy wrapper { data: [...] }
-        getAllWrapped: async (req, res) => {
-            try {
-                let data;
-                if (viewName && sequelize) {
-                    const { QueryTypes } = require('sequelize');
-                    data = await sequelize.query(
-                        `SELECT * FROM ${viewName}`,
-                        { type: QueryTypes.SELECT }
-                    );
-                } else {
-                    data = await Model.findAll();
-                }
-                res.status(200).json({ data, message: 'Select successfully', status: true });
-            } catch (error) {
-                console.error(`Error in getAllWrapped:`, error.message);
-                res.status(500).json({ message: 'Internal server error' });
-            }
-        },
-
-        // GET by ID
         getById: async (req, res) => {
             try {
-                const { id } = req.params;
-                const data = await Model.findByPk(id);
+                const tenant = await tenantCondition(tableName, Model, sequelize, req);
+                const data = await Model.findOne({ where: { [idField]: req.params.id, ...tenant } });
                 if (!data) return res.status(404).json({ message: 'Not found', status: false });
-                res.status(200).json({ data, message: 'Select by ID successfully', status: true });
-            } catch (error) {
-                console.error(`Error in getById:`, error.message);
-                res.status(500).json({ message: 'Internal server error' });
-            }
+                wrap(res, 200, data, 'Select by ID successfully');
+            } catch (e) { sendError(res, `getById(${tableName})`, e); }
         },
 
-        // POST get by criteria (legacy readone) — returns ONE record
         getByOne: async (req, res) => {
             try {
-                const data = await Model.findOne({ where: req.body });
-                res.status(200).json({ data, message: 'Select by criteria successfully', status: true });
-            } catch (error) {
-                console.error(`Error in getByOne:`, error.message);
-                res.status(500).json({ message: 'Internal server error' });
-            }
+                const tenant = await tenantCondition(tableName, Model, sequelize, req);
+                const data = await Model.findOne({ where: { ...req.body, ...tenant } });
+                wrap(res, 200, data, 'Select by criteria successfully');
+            } catch (e) { sendError(res, `getByOne(${tableName})`, e); }
         },
 
-        // POST get by FK filter (read_fk) — returns ALL matching records
-        getByFK: async (req, res) => {
-            try {
-                const data = await Model.findAll({ where: req.body });
-                res.status(200).json({ data, message: 'Select by FK successfully', status: true });
-            } catch (error) {
-                console.error(`Error in getByFK:`, error.message);
-                res.status(500).json({ message: 'Internal server error' });
-            }
-        },
+        getByFK: _getByFK,
 
-        // POST create
-        create: async (req, res) => {
+        // ── Create (unified) ──
+        create: async (req, res, wrapped = false) => {
             try {
+                await preprocessBody(req, tableName, Model, sequelize);
                 const data = await Model.create(req.body);
-                res.status(201).json(data);
-            } catch (error) {
-                console.error(`Error in create:`, error.message);
-                if (error.name === 'SequelizeUniqueConstraintError') {
-                    return res.status(400).json({ message: 'ຂໍ້ມູນຊ້ຳກັນ (Duplicate)', error: error.errors?.[0]?.message || error.message });
-                }
-                res.status(500).json({ message: 'Internal server error', error: error.message });
-            }
+                wrapped ? wrap(res, 201, data, 'Create successfully') : res.status(201).json(data);
+            } catch (e) { sendError(res, `create(${tableName})`, e); }
         },
-
-        // POST create with legacy wrapper
         createWrapped: async (req, res) => {
             try {
+                await preprocessBody(req, tableName, Model, sequelize);
                 const data = await Model.create(req.body);
-                res.status(201).json({ data, message: 'Create successfully', status: true });
-            } catch (error) {
-                console.error(`Error in createWrapped:`, error.message);
-                res.status(500).json({ message: 'Internal server error', error: error.message });
-            }
+                wrap(res, 201, data, 'Create successfully');
+            } catch (e) { sendError(res, `create(${tableName})`, e); }
         },
 
-        // PUT update by :id
-        update: async (req, res) => {
+        // ── Update (unified) ──
+        update: async (req, res, wrapped = false) => {
             try {
                 const id = req.params.id || req.body[idField] || req.body.id;
                 if (!id) return res.status(400).json({ message: 'ID is required', status: false });
-
-                const [affected] = await Model.update(req.body, { where: { [idField]: id } });
-                if (affected === 0) return res.status(404).json({ message: 'Not found or no change', status: false });
-                const updatedData = await Model.findByPk(id);
-                res.status(200).json(updatedData);
-            } catch (error) {
-                console.error(`Error in update:`, error.message);
-                res.status(500).json({ message: 'Internal server error', error: error.message });
-            }
+                await preprocessBody(req, tableName, Model, sequelize);
+                const tenant = await tenantCondition(tableName, Model, sequelize, req);
+                const [affected] = await Model.update(req.body, { where: { [idField]: id, ...tenant } });
+                if (!affected) return res.status(404).json({ message: 'Not found or no change', status: false });
+                const updated = await Model.findOne({ where: { [idField]: id, ...tenant } });
+                wrapped ? wrap(res, 200, updated, 'Update successfully') : res.json(updated);
+            } catch (e) { sendError(res, `update(${tableName})`, e); }
         },
-
-        // PUT update with legacy wrapper
         updateWrapped: async (req, res) => {
             try {
                 const id = req.params.id || req.body[idField] || req.body.id;
                 if (!id) return res.status(400).json({ message: 'ID is required', status: false });
-
-                const [affected] = await Model.update(req.body, { where: { [idField]: id } });
-                if (affected === 0) return res.status(404).json({ message: 'Not found or no change', status: false });
-                const updatedData = await Model.findByPk(id);
-                res.status(200).json({ data: updatedData, message: 'Update successfully', status: true });
-            } catch (error) {
-                console.error(`Error in updateWrapped:`, error.message);
-                res.status(500).json({ message: 'Internal server error' });
-            }
+                await preprocessBody(req, tableName, Model, sequelize);
+                const tenant = await tenantCondition(tableName, Model, sequelize, req);
+                const [affected] = await Model.update(req.body, { where: { [idField]: id, ...tenant } });
+                if (!affected) return res.status(404).json({ message: 'Not found or no change', status: false });
+                const updated = await Model.findOne({ where: { [idField]: id, ...tenant } });
+                wrap(res, 200, updated, 'Update successfully');
+            } catch (e) { sendError(res, `update(${tableName})`, e); }
         },
 
-        // DELETE by :id
+        // ── Delete (soft/hard) ──
         remove: async (req, res) => {
             try {
                 const id = req.params.id || req.body[idField] || req.body.id;
                 if (!id) return res.status(400).json({ message: 'ID is required', status: false });
-
-                const affected = await Model.destroy({ where: { [idField]: id } });
-                if (!affected) return res.status(404).json({ message: 'Not found', status: false });
-                res.status(200).json({ message: 'Delete successfully', status: true });
-            } catch (error) {
-                console.error(`Error in remove:`, error.message);
-                if (error.name === 'SequelizeForeignKeyConstraintError') {
-                    return res.status(400).json({ message: 'ບໍ່ສາມາດລຶບໄດ້ ເພາະມີຂໍ້ມູນອ້າງອີງ (FK constraint)', error: error.message });
+                const tenant = await tenantCondition(tableName, Model, sequelize, req);
+                if (hasDeletedAt) {
+                    const [n] = await Model.update({ deleted_at: new Date() }, { where: { [idField]: id, deleted_at: null, ...tenant } });
+                    if (!n) return res.status(404).json({ message: 'Not found or already deleted', status: false });
+                    return res.json({ message: 'Soft delete successfully', status: true });
                 }
-                res.status(500).json({ message: 'Internal server error', error: error.message });
-            }
+                const n = await Model.destroy({ where: { [idField]: id, ...tenant } });
+                if (!n) return res.status(404).json({ message: 'Not found', status: false });
+                res.json({ message: 'Delete successfully', status: true });
+            } catch (e) { sendError(res, `remove(${tableName})`, e); }
+        },
+
+        // ── Restore ──
+        restore: async (req, res) => {
+            try {
+                const id = req.params.id;
+                if (!id) return res.status(400).json({ message: 'ID is required', status: false });
+                if (!hasDeletedAt) return res.status(400).json({ message: 'Model does not support soft delete', status: false });
+                const [n] = await Model.update({ deleted_at: null }, { where: { [idField]: id } });
+                if (!n) return res.status(404).json({ message: 'Not found', status: false });
+                res.json({ message: 'Restore successfully', status: true });
+            } catch (e) { sendError(res, `restore(${tableName})`, e); }
         },
     };
 }
 
-/**
- * Create Express router with both legacy and RESTful routes for a model
- * @param {string} urlPath - URL path e.g. "/_careers" or "/loans"
- * @param {object} Model - Sequelize model
- * @param {object} options - { idField, customController, schema }
- */
+// ═══════════════════════════════════════════
+// Router Factory
+// ═══════════════════════════════════════════
+
 function createCrudRouter(urlPath, Model, options = {}) {
     const router = express.Router();
     const ctrl = options.customController || createController(Model, options);
+    const vCreate = validate(options.schema?.createSchema);
+    const vUpdate = validate(options.schema?.updateSchema);
 
-    // Extract Zod schemas if provided
-    const createValidation = validate(options.schema && options.schema.createSchema);
-    const updateValidation = validate(options.schema && options.schema.updateSchema);
+    // RESTful
+    router.get(urlPath, ctrl.getAll);
+    router.post(urlPath, vCreate, ctrl.create);
+    router.put(urlPath + '/:id', vUpdate, ctrl.update);
+    router.delete(urlPath + '/:id', ctrl.remove);
+    router.put(urlPath + '/:id/restore', ctrl.restore);
 
-    // ===== RESTful pattern (for RTK Query createCrudEndpoints) =====
-    router.get(urlPath, ctrl.getAll);                                        // GET /name → array
-    router.post(urlPath, createValidation, ctrl.create);                     // POST /name → create
-    router.put(urlPath + '/:id', updateValidation, ctrl.update);             // PUT /name/:id → update
-    router.delete(urlPath + '/:id', ctrl.remove);                            // DELETE /name/:id → delete
-
-    // ===== Legacy pattern (for React Query hooks) =====
-    router.get(urlPath + '/read', ctrl.getAllWrapped);                        // GET /name/read → { data: [] }
-    router.get(urlPath + '/get', ctrl.getAllWrapped);                         // GET /name/get  → { data: [] }
-    router.get(urlPath + '/getbyid/:id', ctrl.getById);                      // GET /name/getbyid/:id
-    router.post(urlPath + '/readone', ctrl.getByOne);                        // POST /name/readone
-    router.post(urlPath + '/getbyone', ctrl.getByOne);                       // POST /name/getbyone
-    router.post(urlPath + '/create', createValidation, ctrl.createWrapped);   // POST /name/create
-    router.put(urlPath + '/update/:id', updateValidation, ctrl.updateWrapped);// PUT /name/update/:id
-    router.put(urlPath + '/update', updateValidation, ctrl.updateWrapped);    // PUT /name/update (id in body)
-    router.delete(urlPath + '/delete/:id', ctrl.remove);                     // DELETE /name/delete/:id
-    router.post(urlPath + '/read_fk', ctrl.getByFK);                         // POST /name/read_fk → filter by FK
+    // Legacy
+    router.get(urlPath + '/read', ctrl.getAllWrapped);
+    router.get(urlPath + '/get', ctrl.getAllWrapped);
+    router.get(urlPath + '/getbyid/:id', ctrl.getById);
+    router.post(urlPath + '/readone', ctrl.getByOne);
+    router.post(urlPath + '/getbyone', ctrl.getByOne);
+    router.post(urlPath + '/create', vCreate, ctrl.createWrapped);
+    router.put(urlPath + '/update/:id', vUpdate, ctrl.updateWrapped);
+    router.put(urlPath + '/update', vUpdate, ctrl.updateWrapped);
+    router.delete(urlPath + '/delete/:id', ctrl.remove);
+    router.put(urlPath + '/restore/:id', ctrl.restore);
+    router.post(urlPath + '/read_fk', ctrl.getByFK);
 
     return router;
 }

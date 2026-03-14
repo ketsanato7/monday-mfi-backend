@@ -25,6 +25,14 @@ module.exports = (sequelize, DataTypes) => {
         latitude: { type: DataTypes.STRING(255), allowNull: false },
         longitude: { type: DataTypes.STRING(255), allowNull: false },
         enterprise_info_id: { type: DataTypes.INTEGER },
-        other_infos: { type: DataTypes.STRING(255) }
-    }, { tableName: 'mfi_info', timestamps: false });
+        other_infos: { type: DataTypes.STRING(255) },
+        // ═══ Audit Fields (AML/CFT ມ.20) ═══
+        created_at: { type: DataTypes.DATE },
+        updated_at: { type: DataTypes.DATE },
+    // ═══ Audit Trail (AML/CFT ມ.22) ═══
+    created_by: { type: DataTypes.INTEGER },
+    updated_by: { type: DataTypes.INTEGER },
+    // ═══ Soft Delete (AML/CFT ມ.20) ═══
+    deleted_at: { type: DataTypes.DATE },
+    }, { tableName: 'mfi_info', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

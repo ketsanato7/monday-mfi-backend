@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
         updatedAt: { type: DataTypes.DATE, allowNull: false },
         created_at: { type: DataTypes.DATE },
         updated_at: { type: DataTypes.DATE },
+        // ═══ Audit Trail (AML/CFT ມ.22) ═══
+        created_by: { type: DataTypes.INTEGER },
+        updated_by: { type: DataTypes.INTEGER },
         deleted_at: { type: DataTypes.DATE }
-    }, { tableName: 'jdb_http_logs', createdAt: 'created_at', updatedAt: 'updated_at' });
+    }, { tableName: 'jdb_http_logs', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

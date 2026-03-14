@@ -7,6 +7,7 @@
  *
  * If ANY step fails → ALL tables rollback
  */
+const logger = require('../config/logger');
 const db = require('../models');
 const { generateSchedule } = require('./generateSchedule');
 
@@ -220,7 +221,7 @@ async function createFullBorrower(data) {
                     }));
                     await db.loan_repayment_schedules.bulkCreate(scheduleRows, { transaction: t });
                     scheduleCount = rows.length;
-                    console.log(`✅ Created ${scheduleCount} repayment schedule rows`);
+                    logger.info(`✅ Created ${scheduleCount} repayment schedule rows`);
                 }
             }
         }
@@ -289,7 +290,7 @@ async function createFullBorrower(data) {
                     credit_amount_lak: loanAmount,
                 }, { transaction: t });
 
-                console.log(`✅ Journal Entry created: ${refNo} | Dr/Cr: ${loanAmount}`);
+                logger.info(`✅ Journal Entry created: ${refNo} | Dr/Cr: ${loanAmount}`);
             }
         }
 

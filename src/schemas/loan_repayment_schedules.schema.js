@@ -15,7 +15,8 @@ const createSchema = z.object({
     paid_interest: z.number().optional().nullable(),
     penalty_amount: z.number().optional().nullable(),
     paid_penalty: z.number().optional().nullable(),
-    status: z.string().max(20).optional().nullable()
+    status: z.string().max(20).optional().nullable(),
+    branch_id: z.string().max(50).optional().nullable()
 });
 
 const updateSchema = createSchema.partial();
@@ -35,7 +36,8 @@ const querySchema = z.object({
     paid_interest: z.number().optional().nullable(),
     penalty_amount: z.number().optional().nullable(),
     paid_penalty: z.number().optional().nullable(),
-    status: z.string().max(20).optional().nullable()
+    status: z.string().max(20).optional().nullable(),
+    branch_id: z.string().max(50).optional().nullable()
 }).partial();
 
 module.exports = {

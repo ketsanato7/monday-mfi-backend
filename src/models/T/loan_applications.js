@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    return sequelize.define('loan_applications', {
+    const LoanApplications = sequelize.define('loan_applications', {
         id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
         application_no: { type: DataTypes.STRING(255), allowNull: false },
         personal_info_id: { type: DataTypes.INTEGER },
@@ -27,6 +27,20 @@ module.exports = (sequelize, DataTypes) => {
         updatedAt: { type: DataTypes.DATE, allowNull: false },
         bank_name: { type: DataTypes.STRING(255) },
         bank_account_no: { type: DataTypes.STRING(255) },
-        bank_account_owner: { type: DataTypes.STRING(255) }
-    }, { tableName: 'loan_applications' });
+        bank_account_owner: { type: DataTypes.STRING(255) },
+    // ═══ Audit Trail (AML/CFT ມ.22) ═══
+    created_by: { type: DataTypes.INTEGER },
+    updated_by: { type: DataTypes.INTEGER },
+    // ═══ Soft Delete (AML/CFT ມ.20) ═══
+    deleted_at: { type: DataTypes.DATE },
+    }, { tableName: 'loan_applications', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
+
+    LoanApplications.associate = (models) => {
+        LoanApplications.belongsTo(models.personal_info, { foreignKey: 'personal_info_id', as: 'personalInfo' });
+        LoanApplications.belongsTo(models.enterprise_info, { foreignKey: 'enterprise_info_id', as: 'enterpriseInfo' });
+        LoanApplications.belongsTo(models.loan_products, { foreignKey: 'loan_product_id', as: 'loanProduct' });
+        LoanApplications.belongsTo(models.employees, { foreignKey: 'assigned_officer_id', as: 'assignedOfficer' });
+    };
+
+    return LoanApplications;
 };

@@ -11,6 +11,7 @@
  *   5300 = ຄ່າໃຊ້ຈ່າຍສຳຮອງໜີ້ສູນ
  */
 
+const logger = require('../config/logger');
 const db = require('../models');
 const { sequelize } = db;
 const JournalEntry = db['journal_entries'];
@@ -42,7 +43,7 @@ async function getAccountId(accountCode) {
     );
 
     if (rows.length === 0) {
-        console.warn(`⚠️ ບໍ່ພົບ account_code: ${accountCode} — ໃຊ້ null`);
+        logger.warn(`⚠️ ບໍ່ພົບ account_code: ${accountCode} — ໃຊ້ null`);
         return null;
     }
 

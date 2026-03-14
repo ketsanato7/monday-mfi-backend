@@ -9,7 +9,9 @@ const createSchema = z.object({
     opening_date: z.string().optional().nullable(),
     account_status: z.string().max(20).optional().nullable(),
     current_balance: z.number().optional().nullable(),
-    accrued_interest: z.number().optional().nullable()
+    accrued_interest: z.number().optional().nullable(),
+    branch_id: z.string().max(50).optional().nullable(),
+    officer_id: z.number().int().optional().nullable()
 });
 
 const updateSchema = createSchema.partial();
@@ -23,6 +25,8 @@ const querySchema = z.object({
     account_status: z.string().max(20).optional().nullable(),
     current_balance: z.number().optional().nullable(),
     accrued_interest: z.number().optional().nullable(),
+    branch_id: z.string().max(50).optional().nullable(),
+    officer_id: z.number().int().optional().nullable(),
     created_at: z.string().optional().nullable(),
     updated_at: z.string().optional().nullable()
 }).partial();

@@ -23,6 +23,14 @@ module.exports = (sequelize, DataTypes) => {
         mfi_info_id: { type: DataTypes.INTEGER },
         mfi_branches_info_id: { type: DataTypes.INTEGER },
         service_units: { type: DataTypes.STRING(255) },
-        branches: { type: DataTypes.STRING(255) }
-    }, { tableName: 'mfi_service_units_info', timestamps: false });
+        branches: { type: DataTypes.STRING(255) },
+        // ═══ Audit Fields (AML/CFT ມ.20) ═══
+        created_at: { type: DataTypes.DATE },
+        updated_at: { type: DataTypes.DATE },
+    // ═══ Audit Trail (AML/CFT ມ.22) ═══
+    created_by: { type: DataTypes.INTEGER },
+    updated_by: { type: DataTypes.INTEGER },
+    // ═══ Soft Delete (AML/CFT ມ.20) ═══
+    deleted_at: { type: DataTypes.DATE },
+    }, { tableName: 'mfi_service_units_info', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

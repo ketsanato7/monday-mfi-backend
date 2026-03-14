@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
         previous_stage: { type: DataTypes.INTEGER },
         org_code: { type: DataTypes.STRING(255) },
         created_at: { type: DataTypes.DATE },
-        updated_at: { type: DataTypes.DATE }
-    }, { tableName: 'loan_ecl_staging', createdAt: 'created_at', updatedAt: 'updated_at' });
+        updated_at: { type: DataTypes.DATE },
+    // ═══ Audit Trail (AML/CFT ມ.22) ═══
+    created_by: { type: DataTypes.INTEGER },
+    updated_by: { type: DataTypes.INTEGER },
+    // ═══ Soft Delete (AML/CFT ມ.20) ═══
+    deleted_at: { type: DataTypes.DATE },
+    }, { tableName: 'loan_ecl_staging', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

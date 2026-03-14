@@ -3,6 +3,7 @@
  * 
  * GET /api/mfi/current — ​ດຶງ​ຂໍ້​ມູນ​ສະ​ຖາ​ບັນ​ປັດ​ຈຸ​ບັນ (​ຊື່, ​ລະ​ຫັດ, ​ໂລ​ໂກ້)
  */
+const logger = require('../config/logger');
 const express = require('express');
 const router = express.Router();
 const db = require('../models');
@@ -55,7 +56,7 @@ router.get('/mfi/current', async (req, res) => {
 
         res.json({ success: true, data: mfiData });
     } catch (err) {
-        console.error('MFI info error:', err);
+        logger.error('MFI info error:', err);
         res.status(500).json({ success: false, message: err.message });
     }
 });

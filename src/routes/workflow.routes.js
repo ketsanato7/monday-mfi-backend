@@ -11,11 +11,12 @@
  * PUT    /api/approval-configs/:id       → ແກ້ໄຂ config
  * DELETE /api/approval-configs/:id       → ລຶບ config
  */
+const logger = require('../config/logger');
 const express = require('express');
 const router = express.Router();
 const db = require('../models');
 const seq = db.sequelize;
-const { requirePermission } = require('../middleware/rbac');
+const { requireAuth, requirePermission } = require('../middleware/rbac');
 const {
     executeTransition,
     getAvailableActions,
@@ -41,7 +42,7 @@ router.post('/workflow/transition', requirePermission('ອະນຸມັດສ�
 
         res.json({ ...result, status: true });
     } catch (error) {
-        console.error('❌ Workflow error:', error.message);
+        logger.error('❌ Workflow error:', error.message);
         res.status(400).json({ message: error.message, status: false });
     }
 });
@@ -102,7 +103,7 @@ router.get('/notifications', async (req, res) => {
     }
 });
 
-router.put('/notifications/:id/read', async (req, res) => {
+router.put('/notifications/:id/read', requireAuth, async (req, res) => {
     try {
         const Notification = db['notifications'];
         if (!Notification) return res.status(404).json({ message: 'Not found' });

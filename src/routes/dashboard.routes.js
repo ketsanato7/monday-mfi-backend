@@ -1,3 +1,4 @@
+const logger = require('../config/logger');
 const express = require('express');
 const router = express.Router();
 const db = require('../models/index');
@@ -40,7 +41,7 @@ router.get('/dashboard/summary', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Dashboard API Error:', error);
+        logger.error('Dashboard API Error:', error);
         res.status(500).json({ success: false, message: error.message });
     }
 });

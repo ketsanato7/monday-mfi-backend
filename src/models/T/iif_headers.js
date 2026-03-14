@@ -8,6 +8,9 @@ module.exports = (sequelize, DataTypes) => {
         total_c_records: { type: DataTypes.INTEGER, defaultValue: 0 },
         created_at: { type: DataTypes.DATE },
         updated_at: { type: DataTypes.DATE },
+        // ═══ Audit Trail (AML/CFT ມ.22) ═══
+        created_by: { type: DataTypes.INTEGER },
+        updated_by: { type: DataTypes.INTEGER },
         deleted_at: { type: DataTypes.DATE }
-    }, { tableName: 'iif_headers', createdAt: 'created_at', updatedAt: 'updated_at' });
+    }, { tableName: 'iif_headers', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

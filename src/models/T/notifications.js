@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
         channel: { type: DataTypes.STRING(255) },
         sent_at: { type: DataTypes.DATE },
         createdAt: { type: DataTypes.DATE, allowNull: false },
-        updatedAt: { type: DataTypes.DATE, allowNull: false }
-    }, { tableName: 'notifications' });
+        updatedAt: { type: DataTypes.DATE, allowNull: false },
+    // ═══ Audit Trail (AML/CFT ມ.22) ═══
+    created_by: { type: DataTypes.INTEGER },
+    updated_by: { type: DataTypes.INTEGER },
+    // ═══ Soft Delete (AML/CFT ມ.20) ═══
+    deleted_at: { type: DataTypes.DATE },
+    }, { tableName: 'notifications', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

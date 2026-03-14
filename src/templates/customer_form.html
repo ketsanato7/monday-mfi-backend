@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="lo">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ແບບ ຟອມ ຂໍ້ ມູນ ລູກ ຄ້າ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+
+        body {
+            font-family: 'Phetsarath OT', 'Noto Sans Lao', sans-serif;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #1a237e;
+            padding-bottom: 8px;
+        }
+
+        .header h1 {
+            font-size: 16px;
+            color: #1a237e;
+        }
+
+        .header h2 {
+            font-size: 18px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 8px 0;
+        }
+
+        td {
+            border: 1px solid #ccc;
+            padding: 5px 8px;
+            font-size: 12px;
+        }
+
+        td.label {
+            background: #f0f4ff;
+            font-weight: bold;
+            width: 30%;
+        }
+
+        td.label-sub {
+            background: #f8f9fa;
+            font-weight: bold;
+            width: 30%;
+        }
+
+        .section {
+            margin: 12px 0;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #1a237e;
+            border-left: 4px solid #1a237e;
+            padding-left: 8px;
+            margin-bottom: 5px;
+        }
+
+        .checkbox {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 1px solid #333;
+            margin: 0 3px;
+            vertical-align: middle;
+        }
+
+        .photo-box {
+            border: 1px dashed #999;
+            width: 90px;
+            height: 120px;
+            text-align: center;
+            line-height: 120px;
+            color: #999;
+            font-size: 10px;
+            float: right;
+            margin-left: 10px;
+        }
+
+        .sig {
+            border-top: 1px solid #333;
+            width: 200px;
+            text-align: center;
+            padding-top: 3px;
+            margin-top: 50px;
+            display: inline-block;
+        }
+
+        .note {
+            font-size: 10px;
+            color: #666;
+            margin-top: 10px;
+            padding: 5px;
+            background: #fffde7;
+            border-left: 3px solid #ffc107;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>{{mfi_name}}</h1>
+        <h2>📋 ແບບ ຟອມ ຂໍ້ ມູນ ລູກ ຄ້າ — {{customer_type_label}}</h2>
+        <div style="font-size:11px;color:#666">KYC Form (AML/CFT Law Art.16)</div>
+    </div>
+
+    <div class="photo-box">ຮູບ 3x4<br>(2 ໃບ)</div>
+
+    <!-- ===== ບຸກ ຄົນ ===== -->
+    <div class="section">
+        <div class="section-title">1. ຂໍ້ ມູນ ສ່ວນ ຕົວ</div>
+        <table>
+            <tr>
+                <td class="label">ຊື່ (ລາວ)</td>
+                <td>{{firstname_la}}</td>
+                <td class="label">ນາມ ສະ ກຸນ (ລາວ)</td>
+                <td>{{lastname_la}}</td>
+            </tr>
+            <tr>
+                <td class="label">ຊື່ (ອັງ ກິດ)</td>
+                <td>{{firstname_en}}</td>
+                <td class="label">ນາມ ສະ ກຸນ (ອັງ ກິດ)</td>
+                <td>{{lastname_en}}</td>
+            </tr>
+            <tr>
+                <td class="label">ວັນ ເດືອນ ປີ ເກີດ</td>
+                <td>{{dob}}</td>
+                <td class="label">ເພດ</td>
+                <td>{{gender}}</td>
+            </tr>
+            <tr>
+                <td class="label">ສັນ ຊາດ</td>
+                <td>{{nationality}}</td>
+                <td class="label">ສະ ຖາ ນະ ສົມ ລົດ</td>
+                <td>{{marital_status}}</td>
+            </tr>
+            <tr>
+                <td class="label">ອາ ຊີບ</td>
+                <td>{{career}}</td>
+                <td class="label">ລາຍ ຮັບ/ເດືອນ</td>
+                <td>{{monthly_income}}</td>
+            </tr>
+            <tr>
+                <td class="label">ລາຍ ຈ່າຍ/ເດືອນ</td>
+                <td>{{monthly_expense}}</td>
+                <td class="label">ໜີ້ ທີ່ ມີ</td>
+                <td>{{existing_debt}}</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- ===== ເອ ກະ ສານ ===== -->
+    <div class="section">
+        <div class="section-title">2. ເອ ກະ ສານ ຢັ້ງ ຢືນ ຕົວ ຕົນ (KYC)</div>
+        <table>
+            <tr>
+                <td class="label">ບັດ ປະ ຈຳ ຕົວ ເລກ ທີ</td>
+                <td>{{id_card_no}}</td>
+                <td class="label">ໝົດ ອາ ຍຸ</td>
+                <td>{{id_card_exp}}</td>
+            </tr>
+            <tr>
+                <td class="label">ສຳ ມະ ໂນ ຄົວ ເລກ ທີ</td>
+                <td>{{family_book_no}}</td>
+                <td class="label">ແກ ວ ທີ</td>
+                <td>{{family_book_province}}</td>
+            </tr>
+            <tr>
+                <td class="label">ໜັງ ສື ຜ່ານ ແດນ ເລກ ທີ</td>
+                <td>{{passport_no}}</td>
+                <td class="label">ໝົດ ອາ ຍຸ</td>
+                <td>{{passport_exp}}</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- ===== ທີ່ ຢູ່ ===== -->
+    <div class="section">
+        <div class="section-title">3. ທີ່ ຢູ່ ປະ ຈຸ ບັນ</div>
+        <table>
+            <tr>
+                <td class="label">ແຂວງ</td>
+                <td>{{province}}</td>
+                <td class="label">ເມືອງ</td>
+                <td>{{district}}</td>
+            </tr>
+            <tr>
+                <td class="label">ບ້ານ</td>
+                <td>{{village}}</td>
+                <td class="label">ເບີ ໂທ</td>
+                <td>{{phone}}</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- ===== ຄູ່ ສົມ ລົດ ===== -->
+    <div class="section">
+        <div class="section-title">4. ຂໍ້ ມູນ ຄູ່ ສົມ ລົດ (ຖ້າ ມີ)</div>
+        <table>
+            <tr>
+                <td class="label">ຊື່-ນາມ ສະ ກຸນ</td>
+                <td>{{spouse_name}}</td>
+                <td class="label">ອາ ຊີບ</td>
+                <td>{{spouse_career}}</td>
+            </tr>
+            <tr>
+                <td class="label">ເບີ ໂທ</td>
+                <td>{{spouse_phone}}</td>
+                <td class="label">ລາຍ ຮັບ/ເດືອນ</td>
+                <td>{{spouse_income}}</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- ===== ສຳລັບ ວິ ສາ ຫະ ກິດ ===== -->
+    <div class="section">
+        <div class="section-title">5. ຂໍ້ ມູນ ວິ ສາ ຫະ ກິດ (ສຳ ລັບ ປະ ເພດ ສະ ຖາ ນະ ປະ ກອບ)</div>
+        <table>
+            <tr>
+                <td class="label">ຊື່ ວິ ສາ ຫະ ກິດ</td>
+                <td>{{enterprise_name}}</td>
+                <td class="label">ເລກ ທະ ບຽນ</td>
+                <td>{{register_no}}</td>
+            </tr>
+            <tr>
+                <td class="label">ປະ ເພດ</td>
+                <td>{{enterprise_type}}</td>
+                <td class="label">ຂະ ໜາດ</td>
+                <td>{{enterprise_size}}</td>
+            </tr>
+            <tr>
+                <td class="label">ເລກ ອາ ກອນ</td>
+                <td>{{tax_no}}</td>
+                <td class="label">ເບີ ໂທ</td>
+                <td>{{enterprise_phone}}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="note">
+        📌 BoL/AML: ເອ ກະ ສານ ທັງ ໝົດ ຕ້ອງ ເກັບ ຮັກ ສາ ≥5 ປີ ຫຼັງ ປິດ ບັນ ຊີ (AML ມ.16)
+    </div>
+
+    <div style="margin-top:30px;text-align:center;">
+        <span class="sig">ລາຍ ເຊັນ ຜູ້ ກູ້</span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="sig">ເຈົ້າ ໜ້າ ທີ່</span>
+    </div>
+</body>
+
+</html>

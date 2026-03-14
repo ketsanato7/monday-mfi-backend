@@ -38,16 +38,22 @@ async function loadPermissions() {
  * requireAuth — Verify JWT token and attach user to req
  */
 function requireAuth(req, res, next) {
-    const authHeader = req.headers.authorization;
+    // ✅ Read token from: 1) httpOnly cookie, 2) Authorization header (mobile fallback)
+    let token = req.cookies?.token;
+    if (!token) {
+        const authHeader = req.headers.authorization;
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            token = authHeader.split(' ')[1];
+        }
+    }
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!token) {
         return res.status(401).json({ status: false, message: '❌ ບໍ່ມີ token — ກະລຸນາ login' });
     }
 
     try {
         const jwt = require('jsonwebtoken');
-        const JWT_SECRET = process.env.JWT_SECRET || 'monday_mfi_secret_key_2025';
-        const token = authHeader.split(' ')[1];
+        const JWT_SECRET = process.env.JWT_SECRET;
         const decoded = jwt.verify(token, JWT_SECRET);
         req.user = decoded;
         next();

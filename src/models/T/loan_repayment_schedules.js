@@ -1,5 +1,9 @@
+/**
+ * loan_repayment_schedules — ຕາຕະລາງຊຳລະ
+ * ✅ BOL: branch_id
+ */
 module.exports = (sequelize, DataTypes) => {
-    return sequelize.define('loan_repayment_schedules', {
+    const LoanRepaymentSchedules = sequelize.define('loan_repayment_schedules', {
         id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
         contract_id: { type: DataTypes.BIGINT },
         installment_no: { type: DataTypes.INTEGER, allowNull: false },
@@ -14,6 +18,20 @@ module.exports = (sequelize, DataTypes) => {
         paid_interest: { type: DataTypes.DECIMAL(20, 2), defaultValue: 0 },
         penalty_amount: { type: DataTypes.DECIMAL(20, 2), defaultValue: 0 },
         paid_penalty: { type: DataTypes.DECIMAL(20, 2), defaultValue: 0 },
-        status: { type: DataTypes.STRING(20), defaultValue: 'SCHEDULED' }
-    }, { tableName: 'loan_repayment_schedules', timestamps: false });
+        status: { type: DataTypes.STRING(20), defaultValue: 'SCHEDULED' },
+        // ═══ BOL ═══
+        branch_id: { type: DataTypes.STRING(50) },                       // FK → mfi_branches_info.id
+    // ═══ Audit Trail (AML/CFT ມ.22) ═══
+    created_by: { type: DataTypes.INTEGER },
+    updated_by: { type: DataTypes.INTEGER },
+    // ═══ Soft Delete (AML/CFT ມ.20) ═══
+    deleted_at: { type: DataTypes.DATE },
+    }, { tableName: 'loan_repayment_schedules', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
+
+    LoanRepaymentSchedules.associate = (models) => {
+        LoanRepaymentSchedules.belongsTo(models.loan_contracts, { foreignKey: 'contract_id', as: 'contract' });
+        LoanRepaymentSchedules.belongsTo(models.mfi_branches_info, { foreignKey: 'branch_id', as: 'branch' });
+    };
+
+    return LoanRepaymentSchedules;
 };

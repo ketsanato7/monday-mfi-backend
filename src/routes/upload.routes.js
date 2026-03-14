@@ -3,6 +3,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { requireAuth } = require('../middleware/rbac');
 const router = express.Router();
 
 // Ensure uploads directory exists
@@ -15,7 +16,7 @@ if (!fs.existsSync(uploadDir)) {
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         // Sub-folder by document type (optional query param)
-        const subDir = req.query.type || 'general';
+        const subDir = (req.query.type || 'general').replace(/[^a-zA-Z0-9_-]/g, '');
         const targetDir = path.join(uploadDir, subDir);
         if (!fs.existsSync(targetDir)) {
             fs.mkdirSync(targetDir, { recursive: true });
@@ -51,8 +52,8 @@ const upload = multer({
     limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
 });
 
-// POST /api/uploads — single file
-router.post('/', upload.single('file'), (req, res) => {
+// POST /api/uploads — single file (requireAuth)
+router.post('/', requireAuth, upload.single('file'), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ status: false, message: 'ບໍ່ມີ file' });
     }
@@ -73,8 +74,8 @@ router.post('/', upload.single('file'), (req, res) => {
     });
 });
 
-// POST /api/uploads/multiple — multiple files
-router.post('/multiple', upload.array('files', 10), (req, res) => {
+// POST /api/uploads/multiple — multiple files (requireAuth)
+router.post('/multiple', requireAuth, upload.array('files', 10), (req, res) => {
     if (!req.files || req.files.length === 0) {
         return res.status(400).json({ status: false, message: 'ບໍ່ມີ files' });
     }

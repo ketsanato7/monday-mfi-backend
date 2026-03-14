@@ -3,6 +3,7 @@
  * ── ສ້າງລະຫັດອັດຕະໂນມັດ ──
  */
 const express = require('express');
+const { requireAuth } = require('../middleware/rbac');
 const router = express.Router();
 
 // Helper: generate code in format TABLE-YYYYMMDD-NNNN
@@ -13,15 +14,15 @@ function generateCode(prefix) {
     return `${prefix}-${dateStr}-${rand}`;
 }
 
-// POST /autoid/previewID
-router.post('/autoid/previewID', (req, res) => {
+// POST /autoid/previewID (requireAuth)
+router.post('/autoid/previewID', requireAuth, (req, res) => {
     const { name } = req.body || {};
     const prefix = (name || 'ID').toUpperCase().slice(0, 5);
     res.json({ data: { code: generateCode(prefix) } });
 });
 
-// POST /loan_account_auto/previewID
-router.post('/loan_account_auto/previewID', (req, res) => {
+// POST /loan_account_auto/previewID (requireAuth)
+router.post('/loan_account_auto/previewID', requireAuth, (req, res) => {
     const { name, branchCode, bank_id, user_id } = req.body || {};
     const prefix = `${name || 'LN'}-${branchCode || 'HQ'}`;
     res.json({ data: { code: generateCode(prefix) } });

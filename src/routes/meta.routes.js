@@ -4,6 +4,7 @@
  * GET /api/meta          → ລາຍຊື່ tables ທັງໝົດ ພ້ອມ metadata
  * GET /api/meta/:table   → metadata ລະອຽດ ຂອງ 1 table (fields, grid, form config)
  */
+const logger = require('../config/logger');
 const express = require('express');
 const router = express.Router();
 const fs = require('fs');
@@ -18,7 +19,7 @@ try {
         blueprint = JSON.parse(fs.readFileSync(blueprintPath, 'utf8'));
     }
 } catch (err) {
-    console.error('⚠️ Failed to load frontend-blueprint.json:', err.message);
+    logger.error('⚠️ Failed to load frontend-blueprint.json:', err.message);
 }
 
 // ─── Cascading field definitions ───

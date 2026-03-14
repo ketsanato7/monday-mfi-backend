@@ -2,6 +2,7 @@
  * auditLogger.js — Auto-log mutation requests (POST/PUT/DELETE)
  * Records: method, path, user, timestamp → audit_logs table
  */
+const logger = require('../config/logger');
 const db = require('../models');
 
 function auditLogger(req, res, next) {
@@ -43,7 +44,7 @@ function auditLogger(req, res, next) {
         ).catch(err => {
             // Silent fail — audit should not break the app
             if (!err.message.includes('relation "audit_logs" does not exist')) {
-                console.error('⚠️ Audit log error:', err.message);
+                logger.error('⚠️ Audit log error:', err.message);
             }
         });
 

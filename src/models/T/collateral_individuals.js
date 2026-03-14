@@ -5,6 +5,9 @@ module.exports = (sequelize, DataTypes) => {
         collateral_id: { type: DataTypes.BIGINT, allowNull: false },
         created_at: { type: DataTypes.DATE },
         updated_at: { type: DataTypes.DATE },
+        // ═══ Audit Trail (AML/CFT ມ.22) ═══
+        created_by: { type: DataTypes.INTEGER },
+        updated_by: { type: DataTypes.INTEGER },
         deleted_at: { type: DataTypes.DATE }
-    }, { tableName: 'collateral_individuals', createdAt: 'created_at', updatedAt: 'updated_at' });
+    }, { tableName: 'collateral_individuals', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

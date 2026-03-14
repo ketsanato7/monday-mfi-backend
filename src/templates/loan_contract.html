@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="lo">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ສັນ ຍາ ກູ້ ຢືມ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+
+        body {
+            font-family: 'Phetsarath OT', 'Noto Sans Lao', sans-serif;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 16px;
+            color: #1a237e;
+        }
+
+        .header h2 {
+            font-size: 20px;
+            border-bottom: 2px double #1a237e;
+            padding-bottom: 8px;
+            display: inline-block;
+        }
+
+        .contract-no {
+            text-align: right;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .article {
+            margin: 12px 0;
+        }
+
+        .article-title {
+            font-weight: bold;
+            font-size: 14px;
+            color: #1a237e;
+            margin-bottom: 5px;
+        }
+
+        .indent {
+            padding-left: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 8px 0;
+        }
+
+        td,
+        th {
+            border: 1px solid #ccc;
+            padding: 5px 8px;
+            font-size: 12px;
+        }
+
+        th {
+            background: #e8eaf6;
+            text-align: center;
+        }
+
+        .party-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 8px 0;
+            background: #fafafa;
+            border-radius: 4px;
+        }
+
+        .sig-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .sig-box {
+            text-align: center;
+        }
+
+        .sig-line {
+            border-top: 1px solid #333;
+            margin-top: 60px;
+            padding-top: 5px;
+        }
+
+        .seal {
+            border: 1px dashed #999;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+            line-height: 80px;
+            color: #999;
+            font-size: 10px;
+            margin-top: 10px;
+        }
+
+        .legal-note {
+            font-size: 11px;
+            color: #555;
+            background: #f5f5f5;
+            padding: 8px;
+            border-left: 3px solid #1a237e;
+            margin-top: 15px;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>{{mfi_name}}</h1>
+        <div style="font-size:11px;color:#666">{{mfi_address}} | ໂທ: {{mfi_phone}}</div>
+        <h2>📜 ສັນ ຍາ ກູ້ ຢືມ ເງິນ</h2>
+        <div style="font-size:11px;color:#666">LOAN AGREEMENT</div>
+    </div>
+
+    <div class="contract-no">
+        ສັນ ຍາ ເລກ ທີ: <strong>{{contract_no}}</strong> &nbsp; ວັນ ທີ: {{date}}
+    </div>
+
+    <!-- ===== ຄູ່ ສັນ ຍາ ===== -->
+    <div class="article">
+        <div class="article-title">ມາ ດ ຕາ 1: ຄູ່ ສັນ ຍາ</div>
+        <div class="party-box">
+            <strong>ຝ່າຍ ໃຫ້ ກູ້ (ຜູ້ ໃຫ້ ກູ້):</strong><br>
+            <div class="indent">
+                ຊື່ ສະ ຖາ ບັນ: {{mfi_name}}<br>
+                ສາ ຂາ: {{branch_name}}<br>
+                ທີ່ ຢູ່: {{mfi_address}}<br>
+                ໃບ ອະ ນຸ ຍາດ ເລກ ທີ: {{license_no}}
+            </div>
+        </div>
+        <div class="party-box">
+            <strong>ຝ່າຍ ກູ້ (ຜູ້ ກູ້):</strong><br>
+            <div class="indent">
+                ຊື່: {{borrower_name_la}} ({{borrower_name_en}})<br>
+                ບັດ ປະ ຈຳ ຕົວ: {{id_card_no}}<br>
+                ທີ່ ຢູ່: {{borrower_address}}<br>
+                ເບີ ໂທ: {{borrower_phone}}
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ເງື່ອນ ໄຂ ===== -->
+    <div class="article">
+        <div class="article-title">ມາ ດ ຕາ 2: ເງື່ອນ ໄຂ ການ ກູ້ ຢືມ</div>
+        <table>
+            <tr>
+                <td style="width:35%;background:#f5f5f5;font-weight:bold">ຈຳ ນວນ ເງິນ ກູ້</td>
+                <td>{{loan_amount}} ({{loan_amount_text}})</td>
+            </tr>
+            <tr>
+                <td style="background:#f5f5f5;font-weight:bold">ປະ ເພດ ສິນ ເຊື່ອ</td>
+                <td>{{loan_product}}</td>
+            </tr>
+            <tr>
+                <td style="background:#f5f5f5;font-weight:bold">ຈຸດ ປະ ສົງ</td>
+                <td>{{loan_purpose}}</td>
+            </tr>
+            <tr>
+                <td style="background:#f5f5f5;font-weight:bold">ອັດ ຕາ ດອກ ເບ້ຍ</td>
+                <td>{{interest_rate}}% ຕໍ່ ປີ (ວິ ທີ: {{interest_method}})</td>
+            </tr>
+            <tr>
+                <td style="background:#f5f5f5;font-weight:bold">ໄລ ຍະ ເວ ລາ</td>
+                <td>{{term_months}} ເດືອນ</td>
+            </tr>
+            <tr>
+                <td style="background:#f5f5f5;font-weight:bold">ວັນ ປ່ອຍ ເງິນ</td>
+                <td>{{disbursement_date}}</td>
+            </tr>
+            <tr>
+                <td style="background:#f5f5f5;font-weight:bold">ວັນ ຄົບ ກຳ ນົດ</td>
+                <td>{{maturity_date}}</td>
+            </tr>
+            <tr>
+                <td style="background:#f5f5f5;font-weight:bold">ງວດ ຊຳ ລະ</td>
+                <td>{{installment_amount}} / ເດືອນ</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- ===== ຫຼັກ ຊັບ ===== -->
+    <div class="article">
+        <div class="article-title">ມາ ດ ຕາ 3: ຫຼັກ ຊັບ ຄ້ຳ ປະ ກັນ</div>
+        <table>
+            <tr>
+                <th>#</th>
+                <th>ປະ ເພດ</th>
+                <th>ລາຍ ລະ ອຽດ</th>
+                <th>ເລກ ທີ ເອ ກະ ສານ</th>
+                <th>ມູນ ຄ່າ</th>
+            </tr>
+            {{collateral_rows}}
+        </table>
+    </div>
+
+    <!-- ===== ເງື່ອນ ໄຂ ກົດ ໝາຍ ===== -->
+    <div class="article">
+        <div class="article-title">ມາ ດ ຕາ 4: ສິດ ແລະ ພັນ ທະ</div>
+        <div class="indent">
+            <p>4.1 ຜູ້ ກູ້ ຕ້ອງ ຊຳ ລະ ຄືນ ຕາມ ຕາ ຕະ ລາງ ທີ່ ກຳ ນົດ</p>
+            <p>4.2 ຖ້າ ຊຳ ລະ ຊ້າ ຈະ ຖືກ ຄິດ ດອກ ເບ້ຍ ປັບ ຕາມ ລະ ບຽບ BoL</p>
+            <p>4.3 ຜູ້ ໃຫ້ ກູ້ ມີ ສິດ ຈັດ ຊັ້ນ ໜີ້ ຕາມ ລະ ບຽບ BoL (A-E)</p>
+            <p>4.4 ຖ້າ ຜູ້ ກູ້ ບໍ່ ຊຳ ລະ ≥180 ວັນ, ຜູ້ ໃຫ້ ກູ້ ມີ ສິດ ຍຶດ ຫຼັກ ຊັບ</p>
+            <p>4.5 ສັນ ຍາ ນີ້ ບັງ ຄັບ ໃຊ້ ຕາມ ກົດ ໝາຍ ສປປ ລາວ</p>
+        </div>
+    </div>
+
+    <!-- ===== ຕາ ຕະ ລາງ ===== -->
+    <div class="page-break"></div>
+    <div class="article">
+        <div class="article-title">ຕາ ຕະ ລາງ ຊຳ ລະ ຄືນ</div>
+        <table>
+            <tr>
+                <th>ງວດ</th>
+                <th>ວັນ ກຳ ນົດ</th>
+                <th>ຕົ້ນ ທຶນ</th>
+                <th>ດອກ ເບ້ຍ</th>
+                <th>ລວມ</th>
+                <th>ຍອດ ຄ້າງ</th>
+            </tr>
+            {{schedule_rows}}
+        </table>
+    </div>
+
+    <!-- ===== ລາຍ ເຊັນ ===== -->
+    <div class="sig-grid">
+        <div class="sig-box">
+            <div class="seal">ກາ ປະ ທັບ</div>
+            <div class="sig-line">ຜູ້ ໃຫ້ ກູ້ ({{mfi_name}})</div>
+            <div style="font-size:11px">ຊື່: ____________________</div>
+            <div style="font-size:11px">ຕຳ ແໜ່ງ: ____________________</div>
+        </div>
+        <div class="sig-box">
+            <div class="sig-line">ຜູ້ ກູ້</div>
+            <div style="font-size:11px">ຊື່: {{borrower_name_la}}</div>
+            <div style="font-size:11px">ລາຍ ນິ້ວ ມື: ☐ ຊ້າຍ ☐ ຂວາ</div>
+        </div>
+    </div>
+
+    <div style="text-align:center;margin-top:30px;">
+        <strong>ພະ ຍານ</strong><br>
+        <span class="sig" style="margin-top:40px">ພະ ຍານ ຄົນ ທີ 1</span>
+        &nbsp;&nbsp;&nbsp;
+        <span class="sig" style="margin-top:40px">ພະ ຍານ ຄົນ ທີ 2</span>
+    </div>
+
+    <div class="legal-note">
+        📌 ສັນ ຍາ ສ້າງ ຂຶ້ນ 3 ສະ ບັບ: (1) ຜູ້ ໃຫ້ ກູ້, (2) ຜູ້ ກູ້, (3) ເກັບ ແຫຼ່ງ ຫຼັກ ຊັບ.<br>
+        📌 ອ້າງ ອີງ: ດຳ ລັດ BoL 184/ລບ, ກົດ ໝາຍ AML/CFT 2024, ກົດ ໝາຍ ແພ່ງ ສປປ ລາວ.
+    </div>
+</body>
+
+</html>

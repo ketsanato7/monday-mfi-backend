@@ -9,6 +9,7 @@ const createSchema = z.object({
     person_id: z.number().int().optional().nullable(),
     book_name: z.string().max(1000).optional().nullable(),
     file_url: z.string().optional().nullable(),
+    village_id: z.number().int().optional().nullable(),
     deleted_at: z.string().optional().nullable()
 });
 
@@ -23,6 +24,7 @@ const querySchema = z.object({
     created_at: z.string().optional().nullable(),
     book_name: z.string().max(1000).optional().nullable(),
     file_url: z.string().optional().nullable(),
+    village_id: z.number().int().optional().nullable(),
     updated_at: z.string().optional().nullable(),
     deleted_at: z.string().optional().nullable()
 }).partial();

@@ -10,6 +10,11 @@ module.exports = (sequelize, DataTypes) => {
         ip_address: { type: DataTypes.STRING(255) },
         user_agent: { type: DataTypes.TEXT },
         description: { type: DataTypes.TEXT },
-        created_at: { type: DataTypes.DATE, allowNull: false }
-    }, { tableName: 'audit_logs', timestamps: false });
+        created_at: { type: DataTypes.DATE, allowNull: false },
+    // ═══ Audit Trail (AML/CFT ມ.22) ═══
+    created_by: { type: DataTypes.INTEGER },
+    updated_by: { type: DataTypes.INTEGER },
+    // ═══ Soft Delete (AML/CFT ມ.20) ═══
+    deleted_at: { type: DataTypes.DATE },
+    }, { tableName: 'audit_logs', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

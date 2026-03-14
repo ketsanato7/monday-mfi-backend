@@ -17,7 +17,9 @@ const createSchema = z.object({
     regulatory_capital: z.number().optional().nullable(),
     currency_id: z.number().int().optional().nullable(),
     enterprise_type_id: z.number().int().optional().nullable(),
-    enterprise_model_detail_id: z.number().int().optional().nullable()
+    enterprise_model_detail_id: z.number().int().optional().nullable(),
+    economic_sector_id: z.number().int().optional().nullable(),
+    economic_branch_id: z.number().int().optional().nullable()
 });
 
 const updateSchema = createSchema.partial();
@@ -38,7 +40,9 @@ const querySchema = z.object({
     regulatory_capital: z.number().optional().nullable(),
     currency_id: z.number().int().optional().nullable(),
     enterprise_type_id: z.number().int().optional().nullable(),
-    enterprise_model_detail_id: z.number().int().optional().nullable()
+    enterprise_model_detail_id: z.number().int().optional().nullable(),
+    economic_sector_id: z.number().int().optional().nullable(),
+    economic_branch_id: z.number().int().optional().nullable()
 }).partial();
 
 module.exports = {

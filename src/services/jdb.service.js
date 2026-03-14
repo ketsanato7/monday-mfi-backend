@@ -11,6 +11,7 @@
  *   disableBill(billNumber)        → ຍົກເລີກ bill
  *   refund({ ... })                → ຄືນເງິນ
  */
+const logger = require('../config/logger');
 const crypto = require('crypto');
 const axios = require('axios');
 const QRCode = require('qrcode');
@@ -39,7 +40,7 @@ function genRequestId(prefix = 'MFI') {
 // ═══════════════════════════════════════════════════════
 function generateSignedHash(bodyString) {
     if (!SIGN_SECRET) {
-        console.warn('⚠️ JDB_SIGN_SECRET not configured — SignedHash will be empty');
+        logger.warn('⚠️ JDB_SIGN_SECRET not configured — SignedHash will be empty');
         return '';
     }
     const mac = crypto.createHmac('sha256', SIGN_SECRET);
@@ -67,7 +68,7 @@ async function authenticate() {
     const bodyString = JSON.stringify(body);
     const signedHash = generateSignedHash(bodyString);
 
-    console.log('🔐 JDB Authenticating...');
+    logger.info('🔐 JDB Authenticating...');
     const res = await axios.post(`${JDB_BASE}/autenticate`, body, {
         headers: {
             'Content-Type': 'application/json',
@@ -85,7 +86,7 @@ async function authenticate() {
     const expiresIn = res.data.data.expiresIn || 999;
     tokenExpiry = Date.now() + (expiresIn * 1000) - 30000;
 
-    console.log(`✅ JDB Token obtained (expires in ${expiresIn}s)`);
+    logger.info(`✅ JDB Token obtained (expires in ${expiresIn}s)`);
     return cachedToken;
 }
 
@@ -110,7 +111,7 @@ async function generateQR({ amount, billNumber, terminalId, terminalLabel, mobil
     const bodyString = JSON.stringify(body);
     const signedHash = generateSignedHash(bodyString);
 
-    console.log(`🏗️ JDB Generating QR — bill: ${billNumber}, amount: ${amount}`);
+    logger.info(`🏗️ JDB Generating QR — bill: ${billNumber}, amount: ${amount}`);
 
     const res = await axios.post(`${JDB_BASE}/generateQr`, body, {
         headers: {
@@ -136,7 +137,7 @@ async function generateQR({ amount, billNumber, terminalId, terminalLabel, mobil
             errorCorrectionLevel: 'M',
         });
     } catch (qrErr) {
-        console.error('⚠️ QR image generation failed:', qrErr.message);
+        logger.error('⚠️ QR image generation failed:', qrErr.message);
     }
 
     return {
@@ -224,7 +225,7 @@ async function disableBill(billNumber) {
     const bodyString = JSON.stringify(body);
     const signedHash = generateSignedHash(bodyString);
 
-    console.log(`🚫 JDB Disabling bill: ${billNumber}`);
+    logger.info(`🚫 JDB Disabling bill: ${billNumber}`);
 
     const res = await axios.post(`${JDB_BASE}/disableBillNumber`, body, {
         headers: {
@@ -256,7 +257,7 @@ async function refund({ txnAmount, billNumber, remark }) {
     const bodyString = JSON.stringify(body);
     const signedHash = generateSignedHash(bodyString);
 
-    console.log(`💸 JDB Refund — bill: ${billNumber}, amount: ${txnAmount}`);
+    logger.info(`💸 JDB Refund — bill: ${billNumber}, amount: ${txnAmount}`);
 
     const res = await axios.post(`${JDB_BASE}/reFund`, body, {
         headers: {

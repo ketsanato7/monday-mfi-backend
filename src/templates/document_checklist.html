@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="lo">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ລາຍ ການ ເອ ກະ ສານ ທີ່ ຕ້ອງ ໃຊ້</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+
+        body {
+            font-family: 'Phetsarath OT', 'Noto Sans Lao', sans-serif;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #1a237e;
+            padding-bottom: 8px;
+        }
+
+        .header h1 {
+            font-size: 16px;
+            color: #1a237e;
+        }
+
+        .header h2 {
+            font-size: 18px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+
+        th {
+            background: #1a237e;
+            color: white;
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
+        }
+
+        td {
+            border: 1px solid #ddd;
+            padding: 6px 10px;
+        }
+
+        .check {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #333;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .required {
+            color: #c62828;
+            font-weight: bold;
+        }
+
+        .optional {
+            color: #2e7d32;
+        }
+
+        .law-ref {
+            font-size: 10px;
+            color: #666;
+        }
+
+        .note {
+            font-size: 11px;
+            background: #fff3e0;
+            padding: 8px;
+            border-left: 3px solid #ff9800;
+            margin-top: 15px;
+        }
+
+        .sig {
+            border-top: 1px solid #333;
+            width: 200px;
+            text-align: center;
+            padding-top: 3px;
+            margin-top: 50px;
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>{{mfi_name}}</h1>
+        <h2>📋 Checklist ເອ ກະ ສານ ປະ ກອບ ການ ກູ້ ຢືມ</h2>
+        <div style="font-size:11px;color:#666">ຕາມ ກົດ ໝາຍ AML/CFT 2024 ມ.16 ແລະ ດຳ ລັດ BoL 184/ລບ</div>
+    </div>
+
+    <div style="font-size:12px;margin-bottom:10px;">
+        <strong>ຜູ້ ກູ້:</strong> {{borrower_name}} | <strong>ສັນ ຍາ:</strong> {{contract_no}} | <strong>ວັນ
+            ທີ:</strong> {{date}}
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width:5%">#</th>
+                <th style="width:5%">✓</th>
+                <th style="width:40%">ເອ ກະ ສານ</th>
+                <th style="width:15%">ບັງ ຄັບ</th>
+                <th style="width:15%">ສຳ ເນົາ</th>
+                <th style="width:20%">ອ້າງ ອີງ ກົດ ໝາຍ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td><span class="check"></span></td>
+                <td><strong>ບັດ ປະ ຈຳ ຕົວ</strong> (ຕົ້ນ ສະ ບັບ + ສຳ ເນົາ)</td>
+                <td class="required">✅ ບັງ ຄັບ</td>
+                <td>2 ໃບ</td>
+                <td class="law-ref">AML/CFT ມ.16</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><span class="check"></span></td>
+                <td><strong>ປຶ້ມ ສຳ ມະ ໂນ ຄົວ</strong> (ສຳ ເນົາ)</td>
+                <td class="required">✅ ບັງ ຄັບ</td>
+                <td>1 ໃບ</td>
+                <td class="law-ref">AML/CFT ມ.16</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td><span class="check"></span></td>
+                <td><strong>ໜັງ ສື ຜ່ານ ແດນ</strong> (ສຳ ລັບ ຄົນ ຕ່າງ ຊາດ)</td>
+                <td class="optional">🟡 ຖ້າ ມີ</td>
+                <td>1 ໃບ</td>
+                <td class="law-ref">AML/CFT ມ.16</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td><span class="check"></span></td>
+                <td><strong>ໃບ ຢັ້ງ ຢືນ ລາຍ ຮັບ / ສະ ລິບ ເງິນ ເດືອນ</strong></td>
+                <td class="required">✅ ບັງ ຄັບ</td>
+                <td>3 ເດືອນ</td>
+                <td class="law-ref">DTI Calculation</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td><span class="check"></span></td>
+                <td><strong>ໃບ ທະ ບຽນ ວິ ສາ ຫະ ກິດ</strong> (ສະ ຖານ ປະ ກອບ)</td>
+                <td class="optional">🟡 ຖ້າ enterprise</td>
+                <td>1 ໃບ</td>
+                <td class="law-ref">ກ.ໝ ວິ ສາ ຫະ ກິດ</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td><span class="check"></span></td>
+                <td><strong>ໃບ ອະ ນຸ ຍາດ ດຳ ເນີນ ທຸ ລະ ກິດ</strong></td>
+                <td class="optional">🟡 ຖ້າ enterprise</td>
+                <td>1 ໃບ</td>
+                <td class="law-ref">ກ.ໝ ວິ ສາ ຫະ ກິດ</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td><span class="check"></span></td>
+                <td><strong>ເອ ກະ ສານ ກຳ ມະ ສິດ ຫຼັກ ຊັບ</strong> (ໃບ ຕາ ດິນ / ທະ ບຽນ ລົດ)</td>
+                <td class="required">✅ ບັງ ຄັບ</td>
+                <td>ຕົ້ນ ສະ ບັບ</td>
+                <td class="law-ref">ດຳ ລັດ 184/ລບ</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td><span class="check"></span></td>
+                <td><strong>ຮູບ ຖ່າຍ 3x4</strong></td>
+                <td class="required">✅ ບັງ ຄັບ</td>
+                <td>2 ໃບ</td>
+                <td class="law-ref">ກົດ ລະ ບຽບ BoL</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td><span class="check"></span></td>
+                <td><strong>ໃບ ຢັ້ງ ຢືນ ທີ່ ຢູ່</strong> (ຈາກ ນາ ຍ ບ້ານ)</td>
+                <td class="optional">🟡 ແນະ ນຳ</td>
+                <td>1 ໃບ</td>
+                <td class="law-ref">BoL best practice</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td><span class="check"></span></td>
+                <td><strong>ໃບ ມອບ ສິດ ຜູ້ ຄ້ຳ ປະ ກັນ</strong></td>
+                <td class="optional">🟡 ຖ້າ ຄ້ຳ ຄົນ</td>
+                <td>1 ໃບ</td>
+                <td class="law-ref">ກ.ໝ ແພ່ງ</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="note">
+        ⚠️ <strong>ຄຳ ເຕືອນ:</strong> ການ ປ່ອຍ ກູ້ ໂດຍ ບໍ່ ມີ ເອ ກະ ສານ KYC ຄົບ ຖ້ວນ ຈະ ຖືກ ປັບ ໃໝ ຕາມ ກົດ ໝາຍ AML/CFT
+        2024.<br>
+        📌 ເອ ກະ ສານ ຕ້ອງ ເກັບ ຮັກ ສາ ≥5 ປີ ຫຼັງ ປິດ ສັນ ຍາ.
+    </div>
+
+    <div style="margin-top:30px;text-align:center;">
+        <span class="sig">ຜູ້ ກູ້ ຢັ້ງ ຢືນ</span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="sig">ເຈົ້າ ໜ້າ ທີ່ ກວດ ສອບ</span>
+    </div>
+</body>
+
+</html>

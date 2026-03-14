@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    return sequelize.define('borrowers_individual', {
+    const BorrowersIndividual = sequelize.define('borrowers_individual', {
         id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
         borrower_id: { type: DataTypes.INTEGER, allowNull: false },
         loan_id: { type: DataTypes.INTEGER },
@@ -46,6 +46,27 @@ module.exports = (sequelize, DataTypes) => {
         spouse_name_1st_en: { type: DataTypes.STRING(255) },
         spouse_surname_en: { type: DataTypes.STRING(255) },
         spouse_name_la: { type: DataTypes.STRING(255) },
-        spouse_surname_la: { type: DataTypes.STRING(255) }
-    }, { tableName: 'borrowers_individual', timestamps: false });
+        spouse_surname_la: { type: DataTypes.STRING(255) },
+        // ═══ Audit Fields (AML/CFT ມ.20) ═══
+        created_at: { type: DataTypes.DATE },
+        updated_at: { type: DataTypes.DATE },
+    // ═══ Audit Trail (AML/CFT ມ.22) ═══
+    created_by: { type: DataTypes.INTEGER },
+    updated_by: { type: DataTypes.INTEGER },
+    // ═══ Soft Delete (AML/CFT ມ.20) ═══
+    deleted_at: { type: DataTypes.DATE },
+    }, { tableName: 'borrowers_individual', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
+
+    BorrowersIndividual.associate = (models) => {
+        BorrowersIndividual.belongsTo(models.personal_info, { foreignKey: 'personal_info_id', as: 'personalInfo' });
+        BorrowersIndividual.belongsTo(models.genders, { foreignKey: 'gender_id', as: 'gender' });
+        BorrowersIndividual.belongsTo(models.nationality, { foreignKey: 'nationality_id', as: 'nationality' });
+        BorrowersIndividual.belongsTo(models.careers, { foreignKey: 'career_id', as: 'career' });
+        BorrowersIndividual.belongsTo(models.villages, { foreignKey: 'village_id', as: 'village' });
+        BorrowersIndividual.belongsTo(models.lao_id_cards, { foreignKey: 'card_id', as: 'idCard' });
+        BorrowersIndividual.belongsTo(models.passports, { foreignKey: 'passport_id', as: 'passport' });
+        BorrowersIndividual.belongsTo(models.family_books, { foreignKey: 'book_id', as: 'familyBook' });
+    };
+
+    return BorrowersIndividual;
 };

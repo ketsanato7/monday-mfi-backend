@@ -16,6 +16,9 @@ module.exports = (sequelize, DataTypes) => {
         updated_at: { type: DataTypes.DATE },
         lcic_customer_id: { type: DataTypes.STRING(50) },
         created_at: { type: DataTypes.DATE },
+        // ═══ Audit Trail (AML/CFT ມ.22) ═══
+        created_by: { type: DataTypes.INTEGER },
+        updated_by: { type: DataTypes.INTEGER },
         deleted_at: { type: DataTypes.DATE }
-    }, { tableName: 'iif_individual_details', createdAt: 'created_at', updatedAt: 'updated_at' });
+    }, { tableName: 'iif_individual_details', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

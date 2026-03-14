@@ -8,6 +8,14 @@ module.exports = (sequelize, DataTypes) => {
         assigned_date: { type: DataTypes.DATEONLY, allowNull: false },
         end_date: { type: DataTypes.DATEONLY },
         status: { type: DataTypes.STRING(255), allowNull: false, defaultValue: 'active' },
-        remark: { type: DataTypes.STRING(255) }
-    }, { tableName: 'employee_branch_assignments', timestamps: false });
+        remark: { type: DataTypes.STRING(255) },
+        // ═══ Audit Fields (AML/CFT ມ.20) ═══
+        created_at: { type: DataTypes.DATE },
+        updated_at: { type: DataTypes.DATE },
+    // ═══ Audit Trail (AML/CFT ມ.22) ═══
+    created_by: { type: DataTypes.INTEGER },
+    updated_by: { type: DataTypes.INTEGER },
+    // ═══ Soft Delete (AML/CFT ມ.20) ═══
+    deleted_at: { type: DataTypes.DATE },
+    }, { tableName: 'employee_branch_assignments', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

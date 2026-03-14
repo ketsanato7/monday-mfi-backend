@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
         max_rate: { type: DataTypes.DECIMAL(10, 4) },
         org_code: { type: DataTypes.STRING(255) },
         created_at: { type: DataTypes.DATE, allowNull: false },
-        updated_at: { type: DataTypes.DATE, allowNull: false }
-    }, { tableName: 'interest_configs', createdAt: 'created_at', updatedAt: 'updated_at' });
+        updated_at: { type: DataTypes.DATE, allowNull: false },
+    // ═══ Audit Trail (AML/CFT ມ.22) ═══
+    created_by: { type: DataTypes.INTEGER },
+    updated_by: { type: DataTypes.INTEGER },
+    // ═══ Soft Delete (AML/CFT ມ.20) ═══
+    deleted_at: { type: DataTypes.DATE },
+    }, { tableName: 'interest_configs', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

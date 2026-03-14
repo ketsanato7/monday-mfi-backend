@@ -4,6 +4,7 @@
  * Scans A/, T/, D/ directories for model files and registers them.
  * Each model file exports: (sequelize, DataTypes) => sequelize.define(...)
  */
+const logger = require('../config/logger');
 const { Sequelize, DataTypes } = require('sequelize');
 const fs = require('fs');
 const path = require('path');
@@ -42,7 +43,7 @@ for (const dir of modelDirs) {
                     db[model.name || model.tableName] = model;
                 }
             } catch (err) {
-                console.error(`⚠️ Failed to load model ${file}:`, err.message);
+                logger.error(`⚠️ Failed to load model ${file}:`, err.message);
             }
         });
 }
@@ -58,14 +59,18 @@ fs.readdirSync(__dirname)
                 db[model.name || model.tableName] = model;
             }
         } catch (err) {
-            console.error(`⚠️ Failed to load model ${file}:`, err.message);
+            logger.error(`⚠️ Failed to load model ${file}:`, err.message);
         }
     });
 
 // ===== Associate models (if associate method exists) =====
-Object.values(db).forEach(model => {
+Object.entries(db).forEach(([name, model]) => {
     if (model.associate) {
-        model.associate(db);
+        try {
+            model.associate(db);
+        } catch (err) {
+            logger.warn(`⚠️ Association failed for ${name}: ${err.message}`);
+        }
     }
 });
 
@@ -74,9 +79,9 @@ db.Sequelize = Sequelize;
 
 // Test connection
 sequelize.authenticate()
-    .then(() => console.log(`✅ Database connected: ${dbConfig.database}@${dbConfig.host}:${dbConfig.port}`))
-    .catch(err => console.error('❌ Database connection error:', err.message));
+    .then(() => logger.info(`✅ Database connected: ${dbConfig.database}@${dbConfig.host}:${dbConfig.port}`))
+    .catch(err => logger.error('❌ Database connection error:', err.message));
 
-console.log(`📦 Loaded ${Object.keys(db).length - 2} models`); // -2 for sequelize and Sequelize
+logger.info(`📦 Loaded ${Object.keys(db).length - 2} models`); // -2 for sequelize and Sequelize
 
 module.exports = db;

@@ -7,6 +7,11 @@ module.exports = (sequelize, DataTypes) => {
         address: { type: DataTypes.STRING(255) },
         phone_number: { type: DataTypes.STRING(255) },
         created_at: { type: DataTypes.DATE, allowNull: false },
-        updated_at: { type: DataTypes.DATE, allowNull: false }
-    }, { tableName: 'org_branches', createdAt: 'created_at', updatedAt: 'updated_at' });
+        updated_at: { type: DataTypes.DATE, allowNull: false },
+    // ═══ Audit Trail (AML/CFT ມ.22) ═══
+    created_by: { type: DataTypes.INTEGER },
+    updated_by: { type: DataTypes.INTEGER },
+    // ═══ Soft Delete (AML/CFT ມ.20) ═══
+    deleted_at: { type: DataTypes.DATE },
+    }, { tableName: 'org_branches', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

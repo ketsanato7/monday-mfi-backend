@@ -1,3 +1,7 @@
+/**
+ * family_books — ປຶ້ມສຳມະໂນຄົວ
+ * ✅ LCIC: village_id (ບ້ານທີ່ອອກ)
+ */
 module.exports = (sequelize, DataTypes) => {
     return sequelize.define('family_books', {
         id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -8,7 +12,12 @@ module.exports = (sequelize, DataTypes) => {
         created_at: { type: DataTypes.DATE },
         book_name: { type: DataTypes.STRING(1000) },
         file_url: { type: DataTypes.TEXT },
+        // ═══ LCIC ═══
+        village_id: { type: DataTypes.INTEGER },                         // FK → villages.id (ບ້ານທີ່ອອກ)
         updated_at: { type: DataTypes.DATE },
+        // ═══ Audit Trail (AML/CFT ມ.22) ═══
+        created_by: { type: DataTypes.INTEGER },
+        updated_by: { type: DataTypes.INTEGER },
         deleted_at: { type: DataTypes.DATE }
-    }, { tableName: 'family_books', createdAt: 'created_at', updatedAt: 'updated_at' });
+    }, { tableName: 'family_books', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

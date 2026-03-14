@@ -15,6 +15,9 @@ module.exports = (sequelize, DataTypes) => {
         loan_status_literal: { type: DataTypes.STRING(20), defaultValue: 'Active' },
         lcic_loan_id: { type: DataTypes.STRING(50) },
         created_at: { type: DataTypes.DATE },
+        // ═══ Audit Trail (AML/CFT ມ.22) ═══
+        created_by: { type: DataTypes.INTEGER },
+        updated_by: { type: DataTypes.INTEGER },
         deleted_at: { type: DataTypes.DATE }
-    }, { tableName: 'iif_loan_details', createdAt: 'created_at', updatedAt: 'updated_at' });
+    }, { tableName: 'iif_loan_details', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

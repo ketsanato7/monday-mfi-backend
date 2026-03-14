@@ -1,5 +1,9 @@
+/**
+ * loan_contracts — ສັນຍາເງິນກູ້
+ * ✅ BOL/LCIC compliant: branch_id, service_unit_id
+ */
 module.exports = (sequelize, DataTypes) => {
-    return sequelize.define('loan_contracts', {
+    const LoanContracts = sequelize.define('loan_contracts', {
         id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
         contract_no: { type: DataTypes.STRING(50), allowNull: false, unique: true },
         product_id: { type: DataTypes.INTEGER },
@@ -30,6 +34,30 @@ module.exports = (sequelize, DataTypes) => {
         write_off_date: { type: DataTypes.DATEONLY },
         extension_date: { type: DataTypes.DATEONLY },
         funding_org: { type: DataTypes.STRING(1000) },
+        // ═══ BOL/LCIC Compliant Fields ═══
+        branch_id: { type: DataTypes.STRING(50) },                      // FK → mfi_branches_info.id (ສາຂາທີ່ປ່ອຍກູ້)
+        service_unit_id: { type: DataTypes.STRING(50) },                 // FK → mfi_service_units_info.id (ໜ່ວຍບໍລິການ)
+        officer_id: { type: DataTypes.INTEGER },                         // FK → employees.id (ພະນັກງານສິນເຊື່ອ)
+        // ═══ Audit Trail (AML/CFT ມ.22) ═══
+        created_by: { type: DataTypes.INTEGER },
+        updated_by: { type: DataTypes.INTEGER },
         deleted_at: { type: DataTypes.DATE }
-    }, { tableName: 'loan_contracts', createdAt: 'created_at', updatedAt: 'updated_at' });
+    }, { tableName: 'loan_contracts', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
+
+    LoanContracts.associate = (models) => {
+        LoanContracts.belongsTo(models.loan_products, { foreignKey: 'product_id', as: 'product' });
+        LoanContracts.belongsTo(models.currencies, { foreignKey: 'currency_id', as: 'currency' });
+        LoanContracts.belongsTo(models.loan_purpose, { foreignKey: 'loan_purpose_id', as: 'loanPurpose' });
+        LoanContracts.belongsTo(models.loan_classifications, { foreignKey: 'classification_id', as: 'classification' });
+        LoanContracts.belongsTo(models.economic_sectors, { foreignKey: 'economic_sector_id', as: 'economicSector' });
+        LoanContracts.belongsTo(models.loan_types, { foreignKey: 'loan_type_id', as: 'loanType' });
+        LoanContracts.belongsTo(models.loan_terms, { foreignKey: 'loan_term_id', as: 'loanTerm' });
+        LoanContracts.belongsTo(models.employees, { foreignKey: 'officer_id', as: 'officer' });
+        LoanContracts.belongsTo(models.mfi_branches_info, { foreignKey: 'branch_id', as: 'branch' });
+        LoanContracts.hasMany(models.loan_repayment_schedules, { foreignKey: 'contract_id', as: 'schedules' });
+        LoanContracts.hasMany(models.loan_transactions, { foreignKey: 'contract_id', as: 'transactions' });
+        LoanContracts.hasMany(models.loan_collaterals, { foreignKey: 'loan_id', as: 'collaterals' });
+    };
+
+    return LoanContracts;
 };

@@ -5,6 +5,9 @@ module.exports = (sequelize, DataTypes) => {
         position_id: { type: DataTypes.INTEGER, allowNull: false, unique: true },
         created_at: { type: DataTypes.DATE },
         updated_at: { type: DataTypes.DATE },
+        // ═══ Audit Trail (AML/CFT ມ.22) ═══
+        created_by: { type: DataTypes.INTEGER },
+        updated_by: { type: DataTypes.INTEGER },
         deleted_at: { type: DataTypes.DATE }
-    }, { tableName: 'employee_positions', createdAt: 'created_at', updatedAt: 'updated_at' });
+    }, { tableName: 'employee_positions', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

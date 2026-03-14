@@ -25,7 +25,8 @@ const createSchema = z.object({
     total_family_members: z.number().int().optional().nullable(),
     females: z.number().int().optional().nullable(),
     mobile_no: z.string().max(255).optional().nullable(),
-    telephone_no: z.string().max(255).optional().nullable()
+    telephone_no: z.string().max(255).optional().nullable(),
+    education_id: z.number().int().optional().nullable()
 });
 
 const updateSchema = createSchema.partial();
@@ -54,7 +55,8 @@ const querySchema = z.object({
     total_family_members: z.number().int().optional().nullable(),
     females: z.number().int().optional().nullable(),
     mobile_no: z.string().max(255).optional().nullable(),
-    telephone_no: z.string().max(255).optional().nullable()
+    telephone_no: z.string().max(255).optional().nullable(),
+    education_id: z.number().int().optional().nullable()
 }).partial();
 
 module.exports = {

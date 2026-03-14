@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
         pay_date: { type: DataTypes.DATEONLY },
         created_at: { type: DataTypes.DATE },
         updated_at: { type: DataTypes.DATE },
+        // ═══ Audit Trail (AML/CFT ມ.22) ═══
+        created_by: { type: DataTypes.INTEGER },
+        updated_by: { type: DataTypes.INTEGER },
         deleted_at: { type: DataTypes.DATE }
-    }, { tableName: 'payrolls', createdAt: 'created_at', updatedAt: 'updated_at' });
+    }, { tableName: 'payrolls', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

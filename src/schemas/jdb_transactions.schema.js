@@ -1,6 +1,6 @@
 const { z } = require('zod');
 
-// ===== jdb_transactions =====
+// ===== jdb_transactions (BOL/LCIC compliant) =====
 
 const createSchema = z.object({
     requestId: z.string().max(255),
@@ -17,6 +17,12 @@ const createSchema = z.object({
     refNumber: z.string().max(255).optional().nullable(),
     emv: z.string().optional().nullable(),
     deeplink: z.string().optional().nullable(),
+    // BOL/LCIC fields
+    contract_id: z.number().int().optional().nullable(),
+    installment_no: z.number().int().optional().nullable(),
+    branch_id: z.string().max(50).optional().nullable(),
+    payment_type: z.string().max(10).optional().nullable(),
+    bank_config_id: z.number().int().optional().nullable(),
     deleted_at: z.string().optional().nullable()
 });
 
@@ -40,6 +46,12 @@ const querySchema = z.object({
     updatedAt: z.string().optional().nullable(),
     emv: z.string().optional().nullable(),
     deeplink: z.string().optional().nullable(),
+    // BOL/LCIC fields
+    contract_id: z.number().int().optional().nullable(),
+    installment_no: z.number().int().optional().nullable(),
+    branch_id: z.string().max(50).optional().nullable(),
+    payment_type: z.string().max(10).optional().nullable(),
+    bank_config_id: z.number().int().optional().nullable(),
     created_at: z.string().optional().nullable(),
     updated_at: z.string().optional().nullable(),
     deleted_at: z.string().optional().nullable()
@@ -51,3 +63,4 @@ module.exports = {
     querySchema,
     tableName: 'jdb_transactions',
 };
+

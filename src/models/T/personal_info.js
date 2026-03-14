@@ -1,5 +1,9 @@
+/**
+ * personal_info — ຂໍ້ມູນບຸກຄົນ
+ * ✅ BOL/LCIC: education_id ສຳລັບລາຍງານ
+ */
 module.exports = (sequelize, DataTypes) => {
-    return sequelize.define('personal_info', {
+    const PersonalInfo = sequelize.define('personal_info', {
         id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
         dateofbirth: { type: DataTypes.DATEONLY },
         gender_id: { type: DataTypes.INTEGER, allowNull: false },
@@ -23,6 +27,27 @@ module.exports = (sequelize, DataTypes) => {
         total_family_members: { type: DataTypes.INTEGER },
         females: { type: DataTypes.INTEGER },
         mobile_no: { type: DataTypes.STRING(255) },
-        telephone_no: { type: DataTypes.STRING(255) }
-    }, { tableName: 'personal_info', timestamps: false });
+        telephone_no: { type: DataTypes.STRING(255) },
+        // ═══ BOL/LCIC ═══
+        education_id: { type: DataTypes.INTEGER },                       // FK → educations.id (LCIC ຕ້ອງການ)
+    // ═══ Audit Trail (AML/CFT ມ.22) ═══
+    created_by: { type: DataTypes.INTEGER },
+    updated_by: { type: DataTypes.INTEGER },
+    // ═══ Soft Delete (AML/CFT ມ.20) ═══
+    deleted_at: { type: DataTypes.DATE },
+    }, { tableName: 'personal_info', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
+
+    PersonalInfo.associate = (models) => {
+        PersonalInfo.belongsTo(models.genders, { foreignKey: 'gender_id', as: 'gender' });
+        PersonalInfo.belongsTo(models.marital_statuses, { foreignKey: 'marital_status_id', as: 'maritalStatus' });
+        PersonalInfo.belongsTo(models.careers, { foreignKey: 'career_id', as: 'career' });
+        PersonalInfo.belongsTo(models.villages, { foreignKey: 'village_id', as: 'village' });
+        PersonalInfo.belongsTo(models.nationality, { foreignKey: 'nationality_id', as: 'nationality' });
+        PersonalInfo.belongsTo(models.educations, { foreignKey: 'education_id', as: 'education' });
+        PersonalInfo.hasMany(models.borrowers_individual, { foreignKey: 'personal_info_id', as: 'borrowerRecords' });
+        PersonalInfo.hasMany(models.loan_applications, { foreignKey: 'personal_info_id', as: 'loanApplications' });
+        PersonalInfo.hasMany(models.deposit_account_owners, { foreignKey: 'person_id', as: 'depositAccounts' });
+    };
+
+    return PersonalInfo;
 };

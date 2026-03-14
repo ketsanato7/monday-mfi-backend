@@ -5,6 +5,11 @@ module.exports = (sequelize, DataTypes) => {
         relative_id: { type: DataTypes.INTEGER },
         relationship_type: { type: DataTypes.STRING(50) },
         is_current: { type: DataTypes.BOOLEAN, defaultValue: true },
-        created_at: { type: DataTypes.DATE }
-    }, { tableName: 'personal_relationships', timestamps: false });
+        created_at: { type: DataTypes.DATE },
+    // ═══ Audit Trail (AML/CFT ມ.22) ═══
+    created_by: { type: DataTypes.INTEGER },
+    updated_by: { type: DataTypes.INTEGER },
+    // ═══ Soft Delete (AML/CFT ມ.20) ═══
+    deleted_at: { type: DataTypes.DATE },
+    }, { tableName: 'personal_relationships', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };

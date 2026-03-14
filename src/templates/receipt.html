@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="lo">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ໃບ ຮັບ ເງິນ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: A5 landscape;
+            margin: 10mm;
+        }
+
+        body {
+            font-family: 'Phetsarath OT', 'Noto Sans Lao', sans-serif;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .receipt {
+            border: 2px solid #1a237e;
+            padding: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 1px solid #1a237e;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+
+        .header h1 {
+            font-size: 14px;
+            color: #1a237e;
+        }
+
+        .header h2 {
+            font-size: 16px;
+        }
+
+        .receipt-no {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 8px 0;
+        }
+
+        td {
+            border: 1px solid #ddd;
+            padding: 4px 8px;
+        }
+
+        td.label {
+            background: #f0f4ff;
+            font-weight: bold;
+            width: 35%;
+        }
+
+        .total-row td {
+            background: #e8eaf6;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .amount-text {
+            font-size: 11px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .sig-area {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        .sig-item {
+            width: 45%;
+        }
+
+        .sig-line {
+            border-top: 1px solid #333;
+            margin-top: 40px;
+            padding-top: 3px;
+            font-size: 11px;
+        }
+
+        .copy-note {
+            text-align: center;
+            font-size: 10px;
+            color: #999;
+            margin-top: 10px;
+            border-top: 1px dashed #ccc;
+            padding-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="receipt">
+        <div class="header">
+            <h1>{{mfi_name}}</h1>
+            <h2>💵 ໃບ ຮັບ ເງິນ</h2>
+            <div style="font-size:10px;color:#666">PAYMENT RECEIPT</div>
+        </div>
+
+        <div class="receipt-no">
+            <span>ເລກ ທີ: <strong>{{receipt_no}}</strong></span>
+            <span>ວັນ ທີ: {{date}}</span>
+        </div>
+
+        <table>
+            <tr>
+                <td class="label">ຮັບ ຈາກ</td>
+                <td>{{payer_name}}</td>
+            </tr>
+            <tr>
+                <td class="label">ສັນ ຍາ ເລກ ທີ</td>
+                <td>{{contract_no}}</td>
+            </tr>
+            <tr>
+                <td class="label">ງວດ ທີ</td>
+                <td>{{installment_no}} / {{total_installments}}</td>
+            </tr>
+            <tr>
+                <td class="label">ຕົ້ນ ທຶນ</td>
+                <td>{{principal}}</td>
+            </tr>
+            <tr>
+                <td class="label">ດອກ ເບ້ຍ</td>
+                <td>{{interest}}</td>
+            </tr>
+            <tr>
+                <td class="label">ຄ່າ ປັບ</td>
+                <td>{{penalty}}</td>
+            </tr>
+            <tr class="total-row">
+                <td class="label">ລວມ ທັງ ໝົດ</td>
+                <td>{{total_amount}}</td>
+            </tr>
+        </table>
+
+        <div class="amount-text">({{total_amount_text}})</div>
+
+        <table style="margin-top:5px">
+            <tr>
+                <td class="label">ຍອດ ຄ້າງ ເຫຼືອ</td>
+                <td>{{remaining_balance}}</td>
+            </tr>
+            <tr>
+                <td class="label">ວິ ທີ ຊຳ ລະ</td>
+                <td>{{payment_method}}</td>
+            </tr>
+        </table>
+
+        <div class="sig-area">
+            <div class="sig-item">
+                <div class="sig-line">ຜູ້ ຈ່າຍ ເງິນ</div>
+            </div>
+            <div class="sig-item">
+                <div class="sig-line">ຜູ້ ຮັບ ເງິນ (ເຈົ້າ ໜ້າ ທີ່)</div>
+            </div>
+        </div>
+
+        <div class="copy-note">ສະ ບັບ ທີ 1: ລູກ ຄ້າ | ສະ ບັບ ທີ 2: ສະ ຖາ ບັນ</div>
+    </div>
+</body>
+
+</html>

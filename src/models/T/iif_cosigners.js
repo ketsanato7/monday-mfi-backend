@@ -7,6 +7,9 @@ module.exports = (sequelize, DataTypes) => {
         cosigner_type: { type: DataTypes.STRING(20) },
         updated_at: { type: DataTypes.DATE },
         created_at: { type: DataTypes.DATE },
+        // ═══ Audit Trail (AML/CFT ມ.22) ═══
+        created_by: { type: DataTypes.INTEGER },
+        updated_by: { type: DataTypes.INTEGER },
         deleted_at: { type: DataTypes.DATE }
-    }, { tableName: 'iif_cosigners', createdAt: 'created_at', updatedAt: 'updated_at' });
+    }, { tableName: 'iif_cosigners', createdAt: 'created_at', updatedAt: 'updated_at', paranoid: true, deletedAt: 'deleted_at' });
 };
